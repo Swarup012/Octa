@@ -45,8 +45,8 @@ Built for people who want a personal AI that actually does things — not just t
 
 ```bash
 # Clone the repo
-git clone https://github.com/Swarup012/solo.git
-cd solo
+git clone https://github.com/Swarup012/Octa.git
+cd Octa
 
 # Build
 make build
@@ -61,8 +61,8 @@ On Windows, use `go build` directly (or use [WSL](https://learn.microsoft.com/en
 
 ```powershell
 # Clone the repo
-git clone https://github.com/Swarup012/solo.git
-cd solo
+git clone https://github.com/Swarup012/Octa.git
+cd Octa
 
 # Build
 go build -o build\octa.exe .\cmd\octa
@@ -75,8 +75,8 @@ copy build\octa.exe C:\Windows\System32\octa.exe
 
 ```bash
 # Clone the repo
-git clone https://github.com/Swarup012/solo.git
-cd solo
+git clone https://github.com/Swarup012/Octa.git
+cd Octa
 
 # Build and run with Docker Compose
 docker compose -f docker/docker-compose.yml up -d
