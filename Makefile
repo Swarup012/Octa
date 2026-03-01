@@ -79,7 +79,7 @@ generate:
 	@$(GO) generate ./...
 	@echo "Run generate complete"
 
-## build: Build the picoclaw binary for current platform
+## build: Build the octa binary for current platform
 build: generate
 	@echo "Building $(BINARY_NAME) for $(PLATFORM)/$(ARCH)..."
 	@mkdir -p $(BUILD_DIR)
