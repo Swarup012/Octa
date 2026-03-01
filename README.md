@@ -48,6 +48,9 @@ Built for people who want a personal AI that actually does things — not just t
 git clone https://github.com/Swarup012/Octa.git
 cd Octa
 
+# Download dependencies
+make deps
+
 # Build
 make build
 
