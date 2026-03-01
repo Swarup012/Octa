@@ -13,6 +13,8 @@ services:
       - agent
     volumes:
       - ./data:/root/.octa
+    environment:
+      - HOME=/root
     entrypoint: ["octa", "agent"]
     stdin_open: true
     tty: true
@@ -32,3 +34,5 @@ services:
       - gateway
     volumes:
       - ./data:/root/.octa
+    environment:
+      - HOME=/root

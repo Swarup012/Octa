@@ -29,16 +29,9 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
 # Copy binary
 COPY --from=builder /src/build/octa /usr/local/bin/octa
 
-# Create non-root user and group
-RUN addgroup -g 1000 octa && \
-    adduser -D -u 1000 -G octa octa
-
 # Copy entrypoint script
 COPY docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
-
-# Switch to non-root user
-USER octa
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD []
