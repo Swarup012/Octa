@@ -29,6 +29,10 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
 # Copy binary
 COPY --from=builder /src/build/octa /usr/local/bin/octa
 
+# Create octa data directory with correct permissions
+RUN mkdir -p /root/.octa/tokens /root/.octa/data /root/.octa/workspace && \
+    chmod -R 755 /root/.octa
+
 # Copy entrypoint script
 COPY docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
