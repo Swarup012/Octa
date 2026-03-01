@@ -1,0 +1,47 @@
+# ── Binaries & Build Artifacts ──────────────────────────────────────────────
+bin/
+build/
+dist/
+*.exe
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# ── Octa Specific ────────────────────────────────────────────────────────────
+.octa/
+cmd/**/workspace
+
+# ── Secrets & Config ─────────────────────────────────────────────────────────
+.env
+config/config.json
+*.json.bak
+
+# Token files (never commit OAuth tokens!)
+tokens/
+**/tokens/*.json
+google.json
+
+# ── Test & Coverage ──────────────────────────────────────────────────────────
+coverage.txt
+coverage.html
+
+# ── OS ───────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Editors ──────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ── Windows Resource Files ───────────────────────────────────────────────────
+*.syso
+
+# ── Temporary files ──────────────────────────────────────────────────────────
+tmp_rovodev_*
+tmp_*/
+*.tmp
