@@ -1,34 +1,34 @@
 services:
   # ─────────────────────────────────────────────
-  # PicoClaw Agent (one-shot query)
-  #   docker compose -f docker/docker-compose.yml run --rm picoclaw-agent -m "Hello"
+  # Octa Agent (one-shot query)
+  #   docker compose -f docker/docker-compose.yml run --rm octa-agent -m "Hello"
   # ─────────────────────────────────────────────
-  picoclaw-agent:
-    image: docker.io/sipeed/picoclaw:latest
-    container_name: picoclaw-agent
+  octa-agent:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: octa:latest
+    container_name: octa-agent
     profiles:
       - agent
-    # Uncomment to access host network; leave commented unless needed.
-    #extra_hosts:
-    #  - "host.docker.internal:host-gateway"
     volumes:
-      - ./data:/root/.picoclaw
-    entrypoint: ["picoclaw", "agent"]
+      - ./data:/root/.octa
+    entrypoint: ["octa", "agent"]
     stdin_open: true
     tty: true
 
   # ─────────────────────────────────────────────
-  # PicoClaw Gateway (Long-running Bot)
-  #   docker compose -f docker/docker-compose.yml up picoclaw-gateway
+  # Octa Gateway (Long-running Bot)
+  #   docker compose -f docker/docker-compose.yml --profile gateway up -d
   # ─────────────────────────────────────────────
-  picoclaw-gateway:
-    image: docker.io/sipeed/picoclaw:latest
-    container_name: picoclaw-gateway
+  octa-gateway:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: octa:latest
+    container_name: octa-gateway
     restart: on-failure
     profiles:
       - gateway
-    # Uncomment to access host network; leave commented unless needed.
-    #extra_hosts:
-    #  - "host.docker.internal:host-gateway"
     volumes:
-      - ./data:/root/.picoclaw
+      - ./data:/root/.octa

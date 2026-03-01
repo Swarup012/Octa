@@ -74,21 +74,22 @@ copy build\octa.exe C:\Windows\System32\octa.exe
 ### Option 2: Docker
 
 ```bash
-# Clone the repo
+# 1. Clone the repo
 git clone https://github.com/Swarup012/Octa.git
 cd Octa
 
-# Build and run with Docker Compose
-docker compose -f docker/docker-compose.yml up -d
-```
+# 2. First run — auto-generates docker/data/config.json then exits
+docker compose -f docker/docker-compose.yml --profile gateway up
+# The container prints "First-run setup complete." and stops.
 
-Or build manually:
+# 3. Set your API keys
+nano docker/data/config.json   # Add your provider API keys, bot tokens, etc.
 
-```bash
-docker build -f docker/Dockerfile -t octa .
-docker run -it \
-  -v ~/.octa:/root/.octa \
-  octa agent
+# 4. Start the gateway (long-running bot)
+docker compose -f docker/docker-compose.yml --profile gateway up -d
+
+# Or run a one-shot agent query
+docker compose -f docker/docker-compose.yml run --rm octa-agent -m "Hello"
 ```
 
 ---
