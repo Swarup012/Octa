@@ -28,8 +28,8 @@ Be respectful, inclusive, and welcoming. We follow the [Contributor Covenant](ht
 
 ```bash
 # Clone
-git clone https://github.com/Swarup012/solo.git
-cd solo
+git clone git@github.com:Swarup012/Octa.git
+cd octa
 
 # Build
 make build
