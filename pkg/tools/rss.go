@@ -4,6 +4,9 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"io"
+	"net/http"
+	"net/url"
 	"regexp"
 	"strings"
 	"sync"
@@ -12,6 +15,7 @@ import (
 	"github.com/mmcdole/gofeed"
 	_ "modernc.org/sqlite"
 
+	pkgdb "github.com/Swarup012/solo/pkg/db"
 	"github.com/Swarup012/solo/pkg/logger"
 )
 
@@ -97,11 +101,12 @@ func (t *RSSFeedTool) Parameters() map[string]any {
 
 func (t *RSSFeedTool) initDB() error {
 	t.initOnce.Do(func() {
-		db, err := sql.Open("sqlite", t.dbPath)
+		sharedDB, err := pkgdb.Get(t.dbPath)
 		if err != nil {
-			t.initErr = err
+			t.initErr = fmt.Errorf("failed to open database: %w", err)
 			return
 		}
+		db := sharedDB
 
 		// Create tables
 		schema := `
@@ -175,11 +180,19 @@ func (t *RSSFeedTool) actionSubscribe(ctx context.Context, args map[string]any) 
 		priority = strings.ToLower(p) == "true"
 	}
 
-	// Parse feed to validate URL
+	// Try to parse feed directly first; if it fails, auto-discover RSS URL
 	fp := gofeed.NewParser()
 	feed, err := fp.ParseURLWithContext(feedURL, ctx)
 	if err != nil {
-		return ErrorResult(fmt.Sprintf("Failed to parse feed: %v", err)).WithError(err)
+		discovered, discErr := discoverFeedURL(ctx, feedURL)
+		if discErr != nil {
+			return ErrorResult(fmt.Sprintf("Failed to parse feed and could not auto-discover RSS URL: %v", err)).WithError(err)
+		}
+		feedURL = discovered
+		feed, err = fp.ParseURLWithContext(feedURL, ctx)
+		if err != nil {
+			return ErrorResult(fmt.Sprintf("Failed to parse discovered feed: %v", err)).WithError(err)
+		}
 	}
 
 	feedID := rssSlug(feedURL)
@@ -391,6 +404,77 @@ func (t *RSSFeedTool) fetchFeedNow(ctx context.Context, feedID, feedURL string) 
 	// Update last_sync
 	_, err = t.db.ExecContext(ctx, `UPDATE rss_feeds SET last_sync = ? WHERE id = ?`, time.Now(), feedID)
 	return err
+}
+
+// discoverFeedURL fetches a webpage and looks for RSS/Atom feed links in the HTML.
+func discoverFeedURL(ctx context.Context, pageURL string) (string, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, pageURL, nil)
+	if err != nil {
+		return "", err
+	}
+	req.Header.Set("User-Agent", "octa-rss-discovery/1.0")
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(io.LimitReader(resp.Body, 1<<20)) // max 1MB
+	if err != nil {
+		return "", err
+	}
+
+	html := string(body)
+
+	// Look for <link rel="alternate" type="application/rss+xml" href="...">
+	// or <link rel="alternate" type="application/atom+xml" href="...">
+	re := regexp.MustCompile(`(?i)<link[^>]+type=["'](application/rss\+xml|application/atom\+xml)["'][^>]*href=["']([^"']+)["']|<link[^>]+href=["']([^"']+)["'][^>]+type=["'](application/rss\+xml|application/atom\+xml)["']`)
+	matches := re.FindStringSubmatch(html)
+
+	var feedHref string
+	if len(matches) >= 3 && matches[2] != "" {
+		feedHref = matches[2]
+	} else if len(matches) >= 4 && matches[3] != "" {
+		feedHref = matches[3]
+	}
+
+	if feedHref == "" {
+		// Fallback: try common feed paths
+		base, err := url.Parse(pageURL)
+		if err != nil {
+			return "", fmt.Errorf("no RSS feed found on page")
+		}
+		commonPaths := []string{"/rss", "/feed", "/rss.xml", "/feed.xml", "/atom.xml", "/rss/feed.xml"}
+		client := &http.Client{Timeout: 5 * time.Second}
+		for _, path := range commonPaths {
+			candidate := base.Scheme + "://" + base.Host + path
+			r, err := http.NewRequestWithContext(ctx, http.MethodGet, candidate, nil)
+			if err != nil {
+				continue
+			}
+			resp, err := client.Do(r)
+			if err != nil {
+				continue
+			}
+			resp.Body.Close()
+			if resp.StatusCode == 200 {
+				return candidate, nil
+			}
+		}
+		return "", fmt.Errorf("no RSS feed found on page %s", pageURL)
+	}
+
+	// Resolve relative URLs
+	base, err := url.Parse(pageURL)
+	if err != nil {
+		return feedHref, nil
+	}
+	feedParsed, err := url.Parse(feedHref)
+	if err != nil {
+		return feedHref, nil
+	}
+	return base.ResolveReference(feedParsed).String(), nil
 }
 
 // Helpers
