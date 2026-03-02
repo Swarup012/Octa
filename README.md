@@ -37,7 +37,44 @@ Built for people who want a personal AI that actually does things — not just t
 
 ## 📦 Installation
 
-### Option 1: Build from Source (Recommended)
+### Option 1: Pre-built Binaries (Easiest)
+
+Download the latest binary for your platform from the [Releases page](https://github.com/Swarup012/Octa/releases/latest):
+
+| Platform | File |
+|---|---|
+| Linux 64-bit | `octa-linux-amd64` |
+| Linux ARM64 (Raspberry Pi 4/5) | `octa-linux-arm64` |
+| macOS Apple Silicon (M1/M2/M3) | `octa-darwin-arm64` |
+| Windows 64-bit | `octa-windows-amd64.exe` |
+
+#### Linux / macOS
+
+```bash
+# Download (replace filename with your platform)
+chmod +x octa-linux-amd64
+sudo mv octa-linux-amd64 /usr/local/bin/octa
+
+# Verify
+octa --version
+```
+
+#### Windows
+
+```powershell
+# 1. Download octa-windows-amd64.exe from the Releases page
+# 2. Rename it to octa.exe
+# 3. Move it to a folder in your PATH, e.g. C:\Windows\System32\
+move octa-windows-amd64.exe octa.exe
+move octa.exe C:\Windows\System32\octa.exe
+
+# 4. Open a new terminal and verify
+octa --version
+```
+
+---
+
+### Option 2: Build from Source (Recommended)
 
 **Requirements:** Go 1.21+
 
