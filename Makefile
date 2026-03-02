@@ -22,7 +22,7 @@ GOFLAGS?=-v -tags stdjson
 GOLANGCI_LINT?=golangci-lint
 
 # Installation
-INSTALL_PREFIX?=$(HOME)/.local
+INSTALL_PREFIX?=/usr/local
 INSTALL_BIN_DIR=$(INSTALL_PREFIX)/bin
 INSTALL_MAN_DIR=$(INSTALL_PREFIX)/share/man/man1
 INSTALL_TMP_SUFFIX=.new
