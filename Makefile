@@ -135,7 +135,7 @@ build-all: generate
 	GOOS=windows GOARCH=amd64 $(GO) build $(LDFLAGS) -o $(BUILD_DIR)/$(BINARY_NAME)-windows-amd64.exe ./$(CMD_DIR)
 	@echo "All builds complete"
 
-## install: Install picoclaw to system and copy builtin skills
+## install: Install octa to system and copy builtin skills
 install: build
 	@echo "Installing $(BINARY_NAME)..."
 	@mkdir -p $(INSTALL_BIN_DIR)

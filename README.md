@@ -67,12 +67,17 @@ On Windows, use `go build` directly (or use [WSL](https://learn.microsoft.com/en
 git clone https://github.com/Swarup012/Octa.git
 cd Octa
 
+# Download dependencies
+go mod download
+
 # Build
 go build -o build\octa.exe .\cmd\octa
 
 # Add to PATH (run as Administrator) or copy manually
 copy build\octa.exe C:\Windows\System32\octa.exe
 ```
+
+> 💡 **Tip:** If you have WSL installed, you can use the Linux/macOS instructions instead — `make` works perfectly in WSL.
 
 
 ---
