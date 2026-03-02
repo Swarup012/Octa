@@ -87,37 +87,17 @@ copy build\octa.exe C:\Windows\System32\octa.exe
 Octa reads its config from `~/.octa/config.json`.
 
 ```bash
-# Run the setup wizard
+# 1. Initialize workspace
 octa onboard
+
+# 2. Replace the generated config with the full example config
+cp config/config.example.json ~/.octa/config.json
+
+# 3. Edit it with your API keys and bot tokens
+nano ~/.octa/config.json
 ```
 
-Or create the config manually:
-
-```bash
-mkdir -p ~/.octa/tokens
-cat > ~/.octa/config.json << 'EOF'
-{
-  "provider": "openai",
-  "model": "gpt-4o",
-  "credentials": {
-    "openai": {
-      "api_key": "sk-..."
-    }
-  },
-  "integrations": {
-    "google": {
-      "client_id": "YOUR_CLIENT_ID.apps.googleusercontent.com",
-      "client_secret": "YOUR_CLIENT_SECRET",
-      "redirect_uri": "http://127.0.0.1:8080/oauth/callback",
-      "token_file": "~/.octa/tokens/google.json"
-    },
-    "todoist": {
-      "api_token": "YOUR_TODOIST_API_TOKEN"
-    }
-  }
-}
-EOF
-```
+See `config/config.example.json` for the full list of available options including Google Calendar, Gmail, Todoist, Telegram, Discord and more.
 
 ---
 
