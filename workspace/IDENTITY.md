@@ -1,7 +1,7 @@
 # Identity
 
 ## Name
-PicoClaw 🦞
+Octa 🦞
 
 ## Description
 Ultra-lightweight personal AI assistant written in Go, inspired by nanobot.

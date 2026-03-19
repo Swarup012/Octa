@@ -12,6 +12,14 @@ import (
 	"github.com/Swarup012/solo/pkg/fileutil"
 )
 
+// AccessLevel defines the filesystem access level granted to a channel/chatID.
+type AccessLevel int
+
+const (
+	AccessWorkspace   AccessLevel = iota // Default: restricted to workspace only
+	AccessUnrestricted                   // Elevated permission: can access anywhere (except danger zones)
+)
+
 // validatePath ensures the given path is within the workspace if restrict is true.
 func validatePath(path, workspace string, restrict bool) (string, error) {
 	if workspace == "" {
@@ -84,17 +92,22 @@ func isWithinWorkspace(candidate, workspace string) bool {
 }
 
 type ReadFileTool struct {
-	fs fileSystem
+	channel  string
+	chatID   string
+	workspace string
+	restrict  bool
 }
 
 func NewReadFileTool(workspace string, restrict bool) *ReadFileTool {
-	var fs fileSystem
-	if restrict {
-		fs = &sandboxFs{workspace: workspace}
-	} else {
-		fs = &hostFs{}
+	return &ReadFileTool{
+		workspace: workspace,
+		restrict:  restrict,
 	}
-	return &ReadFileTool{fs: fs}
+}
+
+func (t *ReadFileTool) SetContext(channel, chatID string) {
+	t.channel = channel
+	t.chatID = chatID
 }
 
 func (t *ReadFileTool) Name() string {
@@ -124,7 +137,49 @@ func (t *ReadFileTool) Execute(ctx context.Context, args map[string]any) *ToolRe
 		return ErrorResult("path is required")
 	}
 
-	content, err := t.fs.ReadFile(path)
+	// Check danger zones first (always blocked)
+	if isDangerZone(path) {
+		return ErrorResult("Access denied: " + path + " is protected")
+	}
+
+	// Check if path is outside workspace when restricted
+	if t.restrict {
+		pathAbs, err := filepath.Abs(path)
+		if err == nil {
+			workspaceAbs, _ := filepath.Abs(t.workspace)
+			rel, err := filepath.Rel(workspaceAbs, pathAbs)
+			if err == nil && strings.HasPrefix(rel, "..") {
+				// Path is outside workspace - check for permission
+				hasSudo, accessLevel := HasExecSudo(t.channel, t.chatID)
+				if !hasSudo || accessLevel != AccessUnrestricted {
+					// No permission - ask for approval
+					return &ToolResult{
+						ForLLM:  "File operation outside workspace requires user approval. Tell the user you need permission for this operation and ask them to reply with 'approve' for one-time or 'approve 5m' for 5 minutes. Do NOT retry the operation until the user grants approval.",
+						ForUser: "",
+						IsError: false,
+					}
+				}
+			}
+		}
+	}
+
+	// Determine which filesystem to use based on current permission
+	var fs fileSystem
+	if t.restrict {
+		hasSudo, accessLevel := HasExecSudo(t.channel, t.chatID)
+		if hasSudo && accessLevel == AccessUnrestricted {
+			// Use hostFs (unrestricted)
+			fs = &hostFs{}
+		} else {
+			// Use sandboxFs (restricted to workspace)
+			fs = &sandboxFs{workspace: t.workspace}
+		}
+	} else {
+		// No restriction configured, always use hostFs
+		fs = &hostFs{}
+	}
+
+	content, err := fs.ReadFile(path)
 	if err != nil {
 		return ErrorResult(err.Error())
 	}
@@ -132,17 +187,22 @@ func (t *ReadFileTool) Execute(ctx context.Context, args map[string]any) *ToolRe
 }
 
 type WriteFileTool struct {
-	fs fileSystem
+	channel  string
+	chatID   string
+	workspace string
+	restrict  bool
 }
 
 func NewWriteFileTool(workspace string, restrict bool) *WriteFileTool {
-	var fs fileSystem
-	if restrict {
-		fs = &sandboxFs{workspace: workspace}
-	} else {
-		fs = &hostFs{}
+	return &WriteFileTool{
+		workspace: workspace,
+		restrict:  restrict,
 	}
-	return &WriteFileTool{fs: fs}
+}
+
+func (t *WriteFileTool) SetContext(channel, chatID string) {
+	t.channel = channel
+	t.chatID = chatID
 }
 
 func (t *WriteFileTool) Name() string {
@@ -181,7 +241,49 @@ func (t *WriteFileTool) Execute(ctx context.Context, args map[string]any) *ToolR
 		return ErrorResult("content is required")
 	}
 
-	if err := t.fs.WriteFile(path, []byte(content)); err != nil {
+	// Check danger zones first (always blocked)
+	if isDangerZone(path) {
+		return ErrorResult("Access denied: " + path + " is protected")
+	}
+
+	// Check if path is outside workspace when restricted
+	if t.restrict {
+		pathAbs, err := filepath.Abs(path)
+		if err == nil {
+			workspaceAbs, _ := filepath.Abs(t.workspace)
+			rel, err := filepath.Rel(workspaceAbs, pathAbs)
+			if err == nil && strings.HasPrefix(rel, "..") {
+				// Path is outside workspace - check for permission
+				hasSudo, accessLevel := HasExecSudo(t.channel, t.chatID)
+				if !hasSudo || accessLevel != AccessUnrestricted {
+					// No permission - ask for approval
+					return &ToolResult{
+						ForLLM:  "File operation outside workspace requires user approval. Tell the user you need permission for this operation and ask them to reply with 'approve' for one-time or 'approve 5m' for 5 minutes. Do NOT retry the operation until the user grants approval.",
+						ForUser: "",
+						IsError: false,
+					}
+				}
+			}
+		}
+	}
+
+	// Determine which filesystem to use based on current permission
+	var fs fileSystem
+	if t.restrict {
+		hasSudo, accessLevel := HasExecSudo(t.channel, t.chatID)
+		if hasSudo && accessLevel == AccessUnrestricted {
+			// Use hostFs (unrestricted)
+			fs = &hostFs{}
+		} else {
+			// Use sandboxFs (restricted to workspace)
+			fs = &sandboxFs{workspace: t.workspace}
+		}
+	} else {
+		// No restriction configured, always use hostFs
+		fs = &hostFs{}
+	}
+
+	if err := fs.WriteFile(path, []byte(content)); err != nil {
 		return ErrorResult(err.Error())
 	}
 
@@ -189,17 +291,22 @@ func (t *WriteFileTool) Execute(ctx context.Context, args map[string]any) *ToolR
 }
 
 type ListDirTool struct {
-	fs fileSystem
+	channel  string
+	chatID   string
+	workspace string
+	restrict  bool
 }
 
 func NewListDirTool(workspace string, restrict bool) *ListDirTool {
-	var fs fileSystem
-	if restrict {
-		fs = &sandboxFs{workspace: workspace}
-	} else {
-		fs = &hostFs{}
+	return &ListDirTool{
+		workspace: workspace,
+		restrict:  restrict,
 	}
-	return &ListDirTool{fs: fs}
+}
+
+func (t *ListDirTool) SetContext(channel, chatID string) {
+	t.channel = channel
+	t.chatID = chatID
 }
 
 func (t *ListDirTool) Name() string {
@@ -229,7 +336,49 @@ func (t *ListDirTool) Execute(ctx context.Context, args map[string]any) *ToolRes
 		path = "."
 	}
 
-	entries, err := t.fs.ReadDir(path)
+	// Check danger zones first (always blocked)
+	if isDangerZone(path) {
+		return ErrorResult("Access denied: " + path + " is protected")
+	}
+
+	// Check if path is outside workspace when restricted
+	if t.restrict {
+		pathAbs, err := filepath.Abs(path)
+		if err == nil {
+			workspaceAbs, _ := filepath.Abs(t.workspace)
+			rel, err := filepath.Rel(workspaceAbs, pathAbs)
+			if err == nil && strings.HasPrefix(rel, "..") {
+				// Path is outside workspace - check for permission
+				hasSudo, accessLevel := HasExecSudo(t.channel, t.chatID)
+				if !hasSudo || accessLevel != AccessUnrestricted {
+					// No permission - ask for approval
+					return &ToolResult{
+						ForLLM:  "File operation outside workspace requires user approval. Tell the user you need permission for this operation and ask them to reply with 'approve' for one-time or 'approve 5m' for 5 minutes. Do NOT retry the operation until the user grants approval.",
+						ForUser: "",
+						IsError: false,
+					}
+				}
+			}
+		}
+	}
+
+	// Determine which filesystem to use based on current permission
+	var fs fileSystem
+	if t.restrict {
+		hasSudo, accessLevel := HasExecSudo(t.channel, t.chatID)
+		if hasSudo && accessLevel == AccessUnrestricted {
+			// Use hostFs (unrestricted)
+			fs = &hostFs{}
+		} else {
+			// Use sandboxFs (restricted to workspace)
+			fs = &sandboxFs{workspace: t.workspace}
+		}
+	} else {
+		// No restriction configured, always use hostFs
+		fs = &hostFs{}
+	}
+
+	entries, err := fs.ReadDir(path)
 	if err != nil {
 		return ErrorResult(fmt.Sprintf("failed to read directory: %v", err))
 	}

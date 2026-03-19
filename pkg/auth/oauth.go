@@ -67,7 +67,7 @@ func decodeBase64(s string) string {
 	return string(data)
 }
 
-func generateState() (string, error) {
+func GenerateState() (string, error) {
 	buf := make([]byte, 32)
 	if _, err := rand.Read(buf); err != nil {
 		return "", err
@@ -81,7 +81,7 @@ func LoginBrowser(cfg OAuthProviderConfig) (*AuthCredential, error) {
 		return nil, fmt.Errorf("generating PKCE: %w", err)
 	}
 
-	state, err := generateState()
+	state, err := GenerateState()
 	if err != nil {
 		return nil, fmt.Errorf("generating state: %w", err)
 	}
@@ -181,13 +181,14 @@ type callbackResult struct {
 	err  error
 }
 
-type deviceCodeResponse struct {
+type DeviceCodeInfo struct {
 	DeviceAuthID string
 	UserCode     string
+	VerifyURL    string
 	Interval     int
 }
 
-func parseDeviceCodeResponse(body []byte) (deviceCodeResponse, error) {
+func parseDeviceCodeResponse(body []byte) (DeviceCodeInfo, error) {
 	var raw struct {
 		DeviceAuthID string          `json:"device_auth_id"`
 		UserCode     string          `json:"user_code"`
@@ -195,15 +196,15 @@ func parseDeviceCodeResponse(body []byte) (deviceCodeResponse, error) {
 	}
 
 	if err := json.Unmarshal(body, &raw); err != nil {
-		return deviceCodeResponse{}, err
+		return DeviceCodeInfo{}, err
 	}
 
 	interval, err := parseFlexibleInt(raw.Interval)
 	if err != nil {
-		return deviceCodeResponse{}, err
+		return DeviceCodeInfo{}, err
 	}
 
-	return deviceCodeResponse{
+	return DeviceCodeInfo{
 		DeviceAuthID: raw.DeviceAuthID,
 		UserCode:     raw.UserCode,
 		Interval:     interval,
@@ -232,7 +233,7 @@ func parseFlexibleInt(raw json.RawMessage) (int, error) {
 	return 0, fmt.Errorf("invalid integer value: %s", string(raw))
 }
 
-func LoginDeviceCode(cfg OAuthProviderConfig) (*AuthCredential, error) {
+func RequestDeviceCode(cfg OAuthProviderConfig) (*DeviceCodeInfo, error) {
 	reqBody, _ := json.Marshal(map[string]string{
 		"client_id": cfg.ClientID,
 	})
@@ -252,42 +253,20 @@ func LoginDeviceCode(cfg OAuthProviderConfig) (*AuthCredential, error) {
 		return nil, fmt.Errorf("device code request failed: %s", string(body))
 	}
 
-	deviceResp, err := parseDeviceCodeResponse(body)
+	info, err := parseDeviceCodeResponse(body)
 	if err != nil {
 		return nil, fmt.Errorf("parsing device code response: %w", err)
 	}
 
-	if deviceResp.Interval < 1 {
-		deviceResp.Interval = 5
+	if info.Interval < 1 {
+		info.Interval = 5
 	}
 
-	fmt.Printf(
-		"\nTo authenticate, open this URL in your browser:\n\n  %s/codex/device\n\nThen enter this code: %s\n\nWaiting for authentication...\n",
-		cfg.Issuer,
-		deviceResp.UserCode,
-	)
-
-	deadline := time.After(15 * time.Minute)
-	ticker := time.NewTicker(time.Duration(deviceResp.Interval) * time.Second)
-	defer ticker.Stop()
-
-	for {
-		select {
-		case <-deadline:
-			return nil, fmt.Errorf("device code authentication timed out after 15 minutes")
-		case <-ticker.C:
-			cred, err := pollDeviceCode(cfg, deviceResp.DeviceAuthID, deviceResp.UserCode)
-			if err != nil {
-				continue
-			}
-			if cred != nil {
-				return cred, nil
-			}
-		}
-	}
+	info.VerifyURL = cfg.Issuer + "/codex/device"
+	return &info, nil
 }
 
-func pollDeviceCode(cfg OAuthProviderConfig, deviceAuthID, userCode string) (*AuthCredential, error) {
+func PollDeviceCodeOnce(cfg OAuthProviderConfig, deviceAuthID, userCode string) (*AuthCredential, error) {
 	reqBody, _ := json.Marshal(map[string]string{
 		"device_auth_id": deviceAuthID,
 		"user_code":      userCode,
@@ -319,7 +298,39 @@ func pollDeviceCode(cfg OAuthProviderConfig, deviceAuthID, userCode string) (*Au
 	}
 
 	redirectURI := cfg.Issuer + "/deviceauth/callback"
-	return exchangeCodeForTokens(cfg, tokenResp.AuthorizationCode, tokenResp.CodeVerifier, redirectURI)
+	return ExchangeCodeForTokens(cfg, tokenResp.AuthorizationCode, tokenResp.CodeVerifier, redirectURI)
+}
+
+func LoginDeviceCode(cfg OAuthProviderConfig) (*AuthCredential, error) {
+	deviceResp, err := RequestDeviceCode(cfg)
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Printf(
+		"\nTo authenticate, open this URL in your browser:\n\n  %s\n\nThen enter this code: %s\n\nWaiting for authentication...\n",
+		deviceResp.VerifyURL,
+		deviceResp.UserCode,
+	)
+
+	deadline := time.After(15 * time.Minute)
+	ticker := time.NewTicker(time.Duration(deviceResp.Interval) * time.Second)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-deadline:
+			return nil, fmt.Errorf("device code authentication timed out after 15 minutes")
+		case <-ticker.C:
+			cred, err := PollDeviceCodeOnce(cfg, deviceResp.DeviceAuthID, deviceResp.UserCode)
+			if err != nil {
+				continue
+			}
+			if cred != nil {
+				return cred, nil
+			}
+		}
+	}
 }
 
 func RefreshAccessToken(cred *AuthCredential, cfg OAuthProviderConfig) (*AuthCredential, error) {
@@ -409,6 +420,10 @@ func buildAuthorizeURL(cfg OAuthProviderConfig, pkce PKCECodes, state, redirectU
 		return cfg.Issuer + "/auth?" + params.Encode()
 	}
 	return cfg.Issuer + "/oauth/authorize?" + params.Encode()
+}
+
+func ExchangeCodeForTokens(cfg OAuthProviderConfig, code, codeVerifier, redirectURI string) (*AuthCredential, error) {
+	return exchangeCodeForTokens(cfg, code, codeVerifier, redirectURI)
 }
 
 func exchangeCodeForTokens(cfg OAuthProviderConfig, code, codeVerifier, redirectURI string) (*AuthCredential, error) {

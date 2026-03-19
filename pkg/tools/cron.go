@@ -286,6 +286,9 @@ func (t *CronTool) ExecuteJob(ctx context.Context, job *cron.CronJob) string {
 
 	// Execute command if present
 	if job.Payload.Command != "" {
+		// Set context for exec tool before executing
+		t.execTool.SetContext(channel, chatID)
+
 		args := map[string]any{
 			"command": job.Payload.Command,
 		}

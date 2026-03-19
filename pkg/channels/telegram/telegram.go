@@ -101,6 +101,19 @@ func (c *TelegramChannel) Start(ctx context.Context) error {
 
 	c.ctx, c.cancel = context.WithCancel(ctx)
 
+	// Drop any active webhook or lingering getUpdates session from a previous run.
+	// Without this, Telegram keeps the old session alive for up to 30 seconds after
+	// shutdown, causing a 409 Conflict during the next startup. DeleteWebhook with
+	// DropPendingUpdates=false clears the old session immediately while preserving
+	// any unprocessed messages in the queue.
+	if err := c.bot.DeleteWebhook(ctx, &telego.DeleteWebhookParams{
+		DropPendingUpdates: false,
+	}); err != nil {
+		logger.InfoCF("telegram", "DeleteWebhook returned an error (non-fatal, continuing)", map[string]any{
+			"error": err.Error(),
+		})
+	}
+
 	updates, err := c.bot.UpdatesViaLongPolling(c.ctx, &telego.GetUpdatesParams{
 		Timeout: 30,
 	})

@@ -368,6 +368,15 @@ func (al *AgentLoop) processMessage(ctx context.Context, msg bus.InboundMessage)
 	if msg.Channel == "system" {
 		return al.processSystemMessage(ctx, msg)
 	}
+	trimmed := strings.TrimSpace(strings.ToLower(msg.Content))
+	if trimmed == "approve" || trimmed == "approve once" || trimmed == "approve 5m" {
+		duration := 60 * time.Second
+		if trimmed == "approve 5m" {
+			duration = 5 * time.Minute
+		}
+		tools.GrantExecSudo(msg.Channel, msg.ChatID, duration, tools.AccessUnrestricted)
+		return "✅ Permission granted. Now tell me what you want me to run.", nil
+	}
 
 	// Check for commands
 	if response, handled := al.handleCommand(ctx, msg); handled {
@@ -933,6 +942,9 @@ func (al *AgentLoop) runLLMIteration(
 			if contentForLLM == "" && toolResult.Err != nil {
 				contentForLLM = toolResult.Err.Error()
 			}
+			if contentForLLM == "" {
+				contentForLLM = fmt.Sprintf("Tool '%s' completed with no output.", tc.Name)
+			}
 
 			toolResultMsg := providers.Message{Role: "tool", Content: contentForLLM, ToolCallID: tc.ID}
 			messages = append(messages, toolResultMsg)
@@ -959,6 +971,37 @@ func (al *AgentLoop) updateToolContexts(agent *AgentInstance, channel, chatID st
 	if tool, ok := agent.Tools.Get("subagent"); ok {
 		if st, ok := tool.(tools.ContextualTool); ok {
 			st.SetContext(channel, chatID)
+		}
+	}
+	if tool, ok := agent.Tools.Get("exec"); ok {
+		if et, ok := tool.(tools.ContextualTool); ok {
+			et.SetContext(channel, chatID)
+		}
+	}
+	// Filesystem tools for permission checking
+	if tool, ok := agent.Tools.Get("read_file"); ok {
+		if rt, ok := tool.(tools.ContextualTool); ok {
+			rt.SetContext(channel, chatID)
+		}
+	}
+	if tool, ok := agent.Tools.Get("write_file"); ok {
+		if wt, ok := tool.(tools.ContextualTool); ok {
+			wt.SetContext(channel, chatID)
+		}
+	}
+	if tool, ok := agent.Tools.Get("list_dir"); ok {
+		if lt, ok := tool.(tools.ContextualTool); ok {
+			lt.SetContext(channel, chatID)
+		}
+	}
+	if tool, ok := agent.Tools.Get("edit_file"); ok {
+		if et, ok := tool.(tools.ContextualTool); ok {
+			et.SetContext(channel, chatID)
+		}
+	}
+	if tool, ok := agent.Tools.Get("append_file"); ok {
+		if at, ok := tool.(tools.ContextualTool); ok {
+			at.SetContext(channel, chatID)
 		}
 	}
 }
@@ -1328,6 +1371,25 @@ func (al *AgentLoop) handleCommand(ctx context.Context, msg bus.InboundMessage) 
 			return fmt.Sprintf("Switched target channel to %s", value), true
 		default:
 			return fmt.Sprintf("Unknown switch target: %s", target), true
+		}
+
+	case "/approve":
+		if len(args) < 1 {
+			return "Usage: /approve [5m|once|revoke]", true
+		}
+		duration := args[0]
+		switch duration {
+		case "5m":
+			tools.GrantExecSudo(msg.Channel, msg.ChatID, 5*time.Minute, tools.AccessUnrestricted)
+			return "", false // Grant the sudo silently but let LLM see the message so it can auto-retry
+		case "once":
+			tools.GrantExecSudo(msg.Channel, msg.ChatID, 60*time.Second, tools.AccessUnrestricted)
+			return "", false
+		case "revoke":
+			tools.RevokeExecSudo(msg.Channel, msg.ChatID)
+			return "🔒 Shell execution approval revoked. Commands are locked again.", true
+		default:
+			return "Usage: /approve [5m|once|revoke]", true
 		}
 	}
 

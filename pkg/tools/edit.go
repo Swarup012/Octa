@@ -5,24 +5,31 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	"path/filepath"
 	"strings"
 )
 
 // EditFileTool edits a file by replacing old_text with new_text.
 // The old_text must exist exactly in the file.
 type EditFileTool struct {
-	fs fileSystem
+	channel  string
+	chatID   string
+	workspace string
+	restrict  bool
 }
 
 // NewEditFileTool creates a new EditFileTool with optional directory restriction.
 func NewEditFileTool(workspace string, restrict bool) *EditFileTool {
-	var fs fileSystem
-	if restrict {
-		fs = &sandboxFs{workspace: workspace}
-	} else {
-		fs = &hostFs{}
+	return &EditFileTool{
+		workspace: workspace,
+		restrict:  restrict,
 	}
-	return &EditFileTool{fs: fs}
+}
+
+// SetContext sets the channel and chatID for context-aware operations.
+func (t *EditFileTool) SetContext(channel, chatID string) {
+	t.channel = channel
+	t.chatID = chatID
 }
 
 func (t *EditFileTool) Name() string {
@@ -70,24 +77,71 @@ func (t *EditFileTool) Execute(ctx context.Context, args map[string]any) *ToolRe
 		return ErrorResult("new_text is required")
 	}
 
-	if err := editFile(t.fs, path, oldText, newText); err != nil {
+	// Check danger zones first (always blocked)
+	if isDangerZone(path) {
+		return ErrorResult("Access denied: " + path + " is protected")
+	}
+
+	// Check if path is outside workspace when restricted
+	if t.restrict {
+		pathAbs, err := filepath.Abs(path)
+		if err == nil {
+			workspaceAbs, _ := filepath.Abs(t.workspace)
+			rel, err := filepath.Rel(workspaceAbs, pathAbs)
+			if err == nil && strings.HasPrefix(rel, "..") {
+				// Path is outside workspace - check for permission
+				hasSudo, accessLevel := HasExecSudo(t.channel, t.chatID)
+				if !hasSudo || accessLevel != AccessUnrestricted {
+					// No permission - ask for approval
+					return &ToolResult{
+						ForLLM:  "File operation outside workspace requires user approval. Tell the user you need permission for this operation and ask them to reply with 'approve' for one-time or 'approve 5m' for 5 minutes. Do NOT retry the operation until the user grants approval.",
+						ForUser: "",
+						IsError: false,
+					}
+				}
+			}
+		}
+	}
+
+	// Determine which filesystem to use based on current permission
+	var fs fileSystem
+	if t.restrict {
+		hasSudo, accessLevel := HasExecSudo(t.channel, t.chatID)
+		if hasSudo && accessLevel == AccessUnrestricted {
+			// Use hostFs (unrestricted)
+			fs = &hostFs{}
+		} else {
+			// Use sandboxFs (restricted to workspace)
+			fs = &sandboxFs{workspace: t.workspace}
+		}
+	} else {
+		// No restriction configured, always use hostFs
+		fs = &hostFs{}
+	}
+
+	if err := editFile(fs, path, oldText, newText); err != nil {
 		return ErrorResult(err.Error())
 	}
 	return SilentResult(fmt.Sprintf("File edited: %s", path))
 }
 
 type AppendFileTool struct {
-	fs fileSystem
+	channel  string
+	chatID   string
+	workspace string
+	restrict  bool
 }
 
 func NewAppendFileTool(workspace string, restrict bool) *AppendFileTool {
-	var fs fileSystem
-	if restrict {
-		fs = &sandboxFs{workspace: workspace}
-	} else {
-		fs = &hostFs{}
+	return &AppendFileTool{
+		workspace: workspace,
+		restrict:  restrict,
 	}
-	return &AppendFileTool{fs: fs}
+}
+
+func (t *AppendFileTool) SetContext(channel, chatID string) {
+	t.channel = channel
+	t.chatID = chatID
 }
 
 func (t *AppendFileTool) Name() string {
@@ -126,7 +180,49 @@ func (t *AppendFileTool) Execute(ctx context.Context, args map[string]any) *Tool
 		return ErrorResult("content is required")
 	}
 
-	if err := appendFile(t.fs, path, content); err != nil {
+	// Check danger zones first (always blocked)
+	if isDangerZone(path) {
+		return ErrorResult("Access denied: " + path + " is protected")
+	}
+
+	// Check if path is outside workspace when restricted
+	if t.restrict {
+		pathAbs, err := filepath.Abs(path)
+		if err == nil {
+			workspaceAbs, _ := filepath.Abs(t.workspace)
+			rel, err := filepath.Rel(workspaceAbs, pathAbs)
+			if err == nil && strings.HasPrefix(rel, "..") {
+				// Path is outside workspace - check for permission
+				hasSudo, accessLevel := HasExecSudo(t.channel, t.chatID)
+				if !hasSudo || accessLevel != AccessUnrestricted {
+					// No permission - ask for approval
+					return &ToolResult{
+						ForLLM:  "File operation outside workspace requires user approval. Tell the user you need permission for this operation and ask them to reply with 'approve' for one-time or 'approve 5m' for 5 minutes. Do NOT retry the operation until the user grants approval.",
+						ForUser: "",
+						IsError: false,
+					}
+				}
+			}
+		}
+	}
+
+	// Determine which filesystem to use based on current permission
+	var fs fileSystem
+	if t.restrict {
+		hasSudo, accessLevel := HasExecSudo(t.channel, t.chatID)
+		if hasSudo && accessLevel == AccessUnrestricted {
+			// Use hostFs (unrestricted)
+			fs = &hostFs{}
+		} else {
+			// Use sandboxFs (restricted to workspace)
+			fs = &sandboxFs{workspace: t.workspace}
+		}
+	} else {
+		// No restriction configured, always use hostFs
+		fs = &hostFs{}
+	}
+
+	if err := appendFile(fs, path, content); err != nil {
 		return ErrorResult(err.Error())
 	}
 	return SilentResult(fmt.Sprintf("Appended to %s", path))

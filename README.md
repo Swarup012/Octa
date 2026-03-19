@@ -1,238 +1,478 @@
+This project is hevily modified from: https://github.com/sipeed/picoclaw
 <div align="center">
 
-  <h1>🐙 Octa — Your Personal AI Assistant</h1>
+# 🐙 Octa
 
-  <h3>Google Calendar · Gmail · Todoist · RSS · Telegram · Cron Jobs · Web Search</h3>
+**Your personal AI agent — lightweight, fast, and runs everywhere.**
 
-  <p>
-    <img src="https://img.shields.io/badge/Go-1.21+-00ADD8?style=flat&logo=go&logoColor=white" alt="Go">
-    <img src="https://img.shields.io/badge/Arch-x86__64%2C%20ARM64-blue" alt="Hardware">
-    <img src="https://img.shields.io/badge/license-MIT-green" alt="License">
-  </p>
+[![Go](https://img.shields.io/badge/Go-1.21+-00ADD8?style=flat&logo=go)](https://golang.org)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Build](https://img.shields.io/github/actions/workflow/status/Swarup012/solo/build.yml?branch=main)](https://github.com/Swarup012/solo/actions)
+
+[Features](#-features) • [Quick Start](#-quick-start) • [Configuration](#-configuration) • [Docker](#-docker) • [Tools](#-built-in-tools) • [Channels](#-messaging-channels)
 
 </div>
 
 ---
 
-**Octa** is a lightweight, self-hosted personal AI assistant written in Go. It connects to your productivity tools — Google Calendar, Gmail, Todoist, RSS feeds — and lets you control everything through natural language, from a CLI, Telegram, Discord, or any other channel.
+## What is Octa?
 
-Built for people who want a personal AI that actually does things — not just talks about them.
+Octa is a **personal AI agent** written in Go. It connects to your favourite LLM (Claude, Gemini, GPT-4, Llama) and gives it real tools — Google Calendar, Gmail, Todoist, RSS feeds, web search, shell access, and more.
+
+You talk to Octa through Telegram, Discord, Slack, WhatsApp, or directly from your terminal. It remembers context, runs scheduled tasks in the background, and executes multiple tools **in parallel** for fast responses.
+
+Inspired by [OpenClaw](https://github.com/OpenClaw-project) and [PicoClaw](https://github.com/PicoClaw-project). Built for people who want a capable personal assistant that runs on their own machine, with their own API keys, under their own control.
 
 ---
 
 ## ✨ Features
 
-- 🗓️ **Google Calendar** — create, list, find, update, delete events and meetings
-- 📧 **Gmail** — send, read, search, schedule emails
-- ✅ **Todoist** — add tasks, bulk-add, complete, delete, update (single API call for bulk)
-- 📰 **RSS** — subscribe to feeds, read and mark articles
-- ⏰ **Cron Jobs** — schedule reminders and recurring tasks in natural language
-- ⚡ **Parallel Tool Execution** — multiple tools run concurrently using goroutines
-- 🤖 **Multi-Agent** — spawn subagents for complex tasks
-- 💬 **Multi-Channel** — Telegram, Discord, Slack, WhatsApp, LINE, DingTalk, Feishu, WeChat
-- 🔐 **Google OAuth** — browser-based login flow built-in (`octa auth google`)
-- 🧠 **Persistent Memory** — session history and workspace memory
+- 🧠 **Multi-provider LLM** — Claude, Gemini, GPT-4, OpenRouter, Llama, and more
+- ⚡ **Parallel tool execution** — multiple tools run simultaneously in one response
+- 📅 **Google Calendar** — create, list, update, delete events + Google Meet
+- 📧 **Gmail** — send, schedule, search, read emails
+- ✅ **Todoist** — full task management (create, complete, bulk operations)
+- 📰 **RSS Feed Reader** — subscribe, fetch, notify on new articles
+- 🌐 **Web Search & Fetch** — search the web and read pages
+- 🖥️ **Shell** — run terminal commands
+- 💬 **Multiple channels** — Telegram, Discord, Slack, WhatsApp, DingTalk, Feishu, LINE
+- ⏰ **Background scheduler** — email dispatch, meeting reminders, RSS fetch
+- 🧩 **Skills system** — install community skills to extend capabilities
+- 🐳 **Docker ready** — run as a container in seconds
 
 ---
 
-## 📦 Installation
+## 🚀 Quick Start
 
-### Option 1: Pre-built Binaries (Easiest)
+### Prerequisites
+- Go 1.21 or later
+- Git
+- An API key for at least one LLM provider (Claude, Gemini, OpenRouter, etc.)
 
-Download the latest binary for your platform from the [Releases page](https://github.com/Swarup012/Octa/releases/latest):
-
-| Platform | File |
-|---|---|
-| Linux 64-bit | `octa-linux-amd64` |
-| Linux ARM64 (Raspberry Pi 4/5) | `octa-linux-arm64` |
-| macOS Apple Silicon (M1/M2/M3) | `octa-darwin-arm64` |
-| Windows 64-bit | `octa-windows-amd64.exe` |
-
-#### Linux / macOS
+### 1. Clone and build
 
 ```bash
-# Download (replace filename with your platform)
-chmod +x octa-linux-amd64
-sudo mv octa-linux-amd64 /usr/local/bin/octa
-
-# Verify
-octa --version
-```
-
-#### Windows
-
-```powershell
-# 1. Download octa-windows-amd64.exe from the Releases page
-# 2. Rename it to octa.exe
-# 3. Move it to a folder in your PATH, e.g. C:\Windows\System32\
-move octa-windows-amd64.exe octa.exe
-move octa.exe C:\Windows\System32\octa.exe
-
-# 4. Open a new terminal and verify
-octa --version
-```
-
----
-
-### Option 2: Build from Source (Recommended)
-
-**Requirements:** Go 1.21+
-
-#### Linux / macOS
-
-```bash
-# Clone the repo
-git clone https://github.com/Swarup012/Octa.git
-cd Octa
-
-# Download dependencies
-make deps
-
-# Build
+git clone https://github.com/Swarup012/solo.git
+cd solo
 make build
-
-# Install globally
-sudo make install
+make install
 ```
 
-#### Windows
-
-On Windows, use `go build` directly (or use [WSL](https://learn.microsoft.com/en-us/windows/wsl/install)):
-
-```powershell
-# Clone the repo
-git clone https://github.com/Swarup012/Octa.git
-cd Octa
-
-# Download dependencies
-go mod download
-
-# Build
-go build -o build\octa.exe .\cmd\octa
-
-# Add to PATH (run as Administrator) or copy manually
-copy build\octa.exe C:\Windows\System32\octa.exe
-```
-
-> 💡 **Tip:** If you have WSL installed, you can use the Linux/macOS instructions instead — `make` works perfectly in WSL.
-
-
----
-
-## ⚙️ Configuration
-
-Octa reads its config from `~/.octa/config.json`.
+This installs `octa` to `~/.local/bin/octa`. Make sure `~/.local/bin` is in your PATH:
 
 ```bash
-# 1. Initialize workspace
-octa onboard
-
-# 2. Replace the generated config with the full example config
-cp config/config.example.json ~/.octa/config.json
-
-# 3. Edit it with your API keys and bot tokens
-nano ~/.octa/config.json
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
 ```
 
-See `config/config.example.json` for the full list of available options including Google Calendar, Gmail, Todoist, Telegram, Discord and more.
+### 2. Create your config
+
+```bash
+mkdir -p ~/.octa
+cp config/config.example.json ~/.octa/config.json
+```
+
+Edit `~/.octa/config.json` with your API key. Minimum config to get started:
+
+```json
+{
+  "agents": {
+    "defaults": {
+      "model": "gemini-2.0-flash",
+      "max_tokens": 8192,
+      "max_tool_iterations": 20
+    }
+  },
+  "model_list": [
+    {
+      "model_name": "gemini-2.0-flash",
+      "api_base": "https://generativelanguage.googleapis.com/v1beta/openai/",
+      "api_key": "YOUR_GEMINI_API_KEY",
+      "model": "gemini-2.0-flash"
+    }
+  ]
+}
+```
+
+### 3. Run
+
+```bash
+# Interactive terminal session
+octa agent
+
+# One-shot query
+octa agent -m "what's the weather like today?"
+
+# Start the gateway (for Telegram/Discord/Slack bots)
+octa gateway
+```
 
 ---
 
-## 🔐 Google Authentication
+## 🤖 LLM Providers
 
-To enable Google Calendar and Gmail, you need to authenticate once:
+Octa supports any OpenAI-compatible API. Add entries to `model_list` in your config:
 
-### Step 1: Create Google OAuth Credentials
+### Google Gemini (free tier available)
 
-1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+```json
+{
+  "model_name": "gemini-2.0-flash",
+  "api_base": "https://generativelanguage.googleapis.com/v1beta/openai/",
+  "api_key": "YOUR_GEMINI_API_KEY",
+  "model": "gemini-2.0-flash"
+}
+```
+
+Get your key: https://aistudio.google.com/app/apikey
+
+### Anthropic Claude
+
+```json
+{
+  "model_name": "claude-sonnet",
+  "api_key": "sk-ant-YOUR_KEY",
+  "model": "claude-sonnet-4-5"
+}
+```
+
+### OpenRouter (access Claude, GPT-4, Gemini with one key)
+
+```json
+{
+  "model_name": "openrouter",
+  "api_base": "https://openrouter.ai/api/v1",
+  "api_key": "sk-or-v1-YOUR_KEY",
+  "model": "anthropic/claude-sonnet-4-5"
+}
+```
+
+Get your key: https://openrouter.ai
+
+### Ollama (local models — no API key needed)
+
+```json
+{
+  "model_name": "llama3",
+  "api_base": "http://localhost:11434/v1",
+  "api_key": "ollama",
+  "model": "llama3.1:8b"
+}
+```
+
+---
+
+## 🛠️ Built-in Tools
+
+| Tool | What it does |
+|------|-------------|
+| `google_calendar` | Create, list, update, delete calendar events. Adds Google Meet by default. |
+| `gmail` | Send immediate or scheduled emails. Search, read inbox. |
+| `todoist` | Full task management — create (bulk), list, complete, delete, update. |
+| `rss` | Subscribe to RSS/Atom feeds. Auto-fetches every 30 min in gateway mode. |
+| `web_search` | Search the web using configured search API. |
+| `web_fetch` | Fetch and read the content of any URL. |
+| `shell` | Run shell commands on your machine. |
+| `message` | Send a message to the user from within a tool chain. |
+| `spawn` | Spawn a subagent to handle a subtask asynchronously. |
+| `cron` | Schedule recurring tasks. |
+
+---
+
+## 📅 Google Calendar + Gmail Setup
+
+### 1. Create Google OAuth credentials
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com)
 2. Create a new project (or use existing)
-3. Enable **Gmail API** and **Google Calendar API**
-4. Go to **APIs & Services → Credentials → Create OAuth Client ID**
-5. Choose **Desktop App** or **Web Application**
-6. Add `http://127.0.0.1:8080/oauth/callback` as an **Authorized Redirect URI**
-7. Copy your `client_id` and `client_secret` into `~/.octa/config.json`
+3. Enable **Google Calendar API** and **Gmail API**
+4. Go to **APIs & Services → Credentials → Create OAuth 2.0 Client ID**
+5. Application type: **Desktop App**
+6. Download the credentials
 
-### Step 2: Authenticate
+### 2. Add to config
+
+```json
+{
+  "integrations": {
+    "google": {
+      "client_id": "YOUR_CLIENT_ID.apps.googleusercontent.com",
+      "client_secret": "YOUR_CLIENT_SECRET",
+      "redirect_uri": "http://127.0.0.1:8080/oauth/callback",
+      "token_file": "~/.octa/tokens/google.json",
+      "scopes": [
+        "https://www.googleapis.com/auth/calendar",
+        "https://www.googleapis.com/auth/gmail.modify"
+      ]
+    }
+  }
+}
+```
+
+### 3. Authenticate
 
 ```bash
 octa auth google
 ```
 
-This opens your browser → log in with Google → token is saved to `~/.octa/tokens/google.json` automatically. ✅
+This opens a browser for OAuth. After approving, the token is saved to `~/.octa/tokens/google.json`.
 
 ---
 
-## 🚀 Usage
+## ✅ Todoist Setup
 
-### Interactive CLI
-
-```bash
-octa agent
-```
-
-Then just talk naturally:
-
-```
-🐙 You: add go to gym, read a book, and drink water to my todoist
-🐙 You: schedule an email to john@example.com with subject "Meeting" in 10 minutes
-🐙 You: what's on my calendar tomorrow?
-🐙 You: remind me to take a break in 30 minutes
-🐙 You: show my inbox
-```
-
-### One-Shot Command
-
-```bash
-octa agent -m "add buy groceries to my todo list"
-```
-
-### Auth Commands
-
-```bash
-octa auth login --provider openai      # Set OpenAI API key
-octa auth login --provider anthropic   # Set Anthropic API key
-octa auth google                        # Authenticate Google (Calendar + Gmail)
-octa auth status                        # Check all auth status
-```
-
-### Cron Jobs
-
-```bash
-octa cron list          # List all scheduled jobs
-octa cron disable 1     # Disable job with ID 1
-octa cron enable 1      # Enable job with ID 1
-octa cron remove 1      # Remove job with ID 1
-```
-
-### Skills
-
-```bash
-octa skills list            # List installed skills
-octa skills install <name>  # Install a skill
-octa skills remove <name>   # Remove a skill
-```
-
----
-
-## 🌐 Running as a Gateway (Multi-Channel)
-
-To connect Octa to Telegram, Discord, Slack, etc., run the gateway:
-
-```bash
-octa gateway
-```
-
-Add channel config to `~/.octa/config.json`:
+1. Go to https://todoist.com/app/settings/integrations → **API token**
+2. Add to config:
 
 ```json
 {
-  "channels": [
+  "integrations": {
+    "todoist": {
+      "api_token": "YOUR_TODOIST_API_TOKEN"
+    }
+  }
+}
+```
+
+No OAuth needed — just the token.
+
+---
+
+## 💬 Messaging Channels
+
+Run Octa as a bot on any of these platforms:
+
+### Telegram
+
+```json
+{
+  "channels": {
+    "telegram": {
+      "enabled": true,
+      "token": "YOUR_BOT_TOKEN",
+      "allowed_users": ["your_username"]
+    }
+  }
+}
+```
+
+Get a bot token from [@BotFather](https://t.me/BotFather).
+
+### Discord
+
+```json
+{
+  "channels": {
+    "discord": {
+      "enabled": true,
+      "token": "YOUR_DISCORD_BOT_TOKEN",
+      "allowed_channel_ids": ["CHANNEL_ID"]
+    }
+  }
+}
+```
+
+### Slack
+
+```json
+{
+  "channels": {
+    "slack": {
+      "enabled": true,
+      "bot_token": "xoxb-YOUR-TOKEN",
+      "app_token": "xapp-YOUR-TOKEN"
+    }
+  }
+}
+```
+
+Other supported channels: WhatsApp, DingTalk, Feishu, LINE, WeCom, QQ, OneBot.
+
+---
+
+## 🐳 Docker
+
+### Option 1 — Gateway bot (long-running, recommended for Telegram/Discord)
+
+```bash
+# 1. Copy your config
+mkdir -p config
+cp ~/.octa/config.json config/config.json
+
+# 2. Start the gateway
+docker compose --profile gateway up -d
+```
+
+Logs:
+```bash
+docker compose logs -f octa-gateway
+```
+
+Stop:
+```bash
+docker compose --profile gateway down
+```
+
+### Option 2 — One-shot agent query
+
+```bash
+docker compose --profile agent run --rm octa-agent -m "what tasks do I have today?"
+```
+
+### Option 3 — Build and run manually
+
+```bash
+# Build the image
+docker build -t octa .
+
+# Run gateway
+docker run -d \
+  --name octa-gateway \
+  --restart unless-stopped \
+  -v ~/.octa/config.json:/home/octa/.octa/config.json:ro \
+  -v octa-workspace:/home/octa/.octa/workspace \
+  octa gateway
+
+# Run one-shot query
+docker run --rm \
+  -v ~/.octa/config.json:/home/octa/.octa/config.json:ro \
+  octa agent -m "hello!"
+```
+
+### Docker config tips
+
+- Mount your `config.json` as read-only (`:ro`)
+- Use a named volume for the workspace so sessions and memory persist across restarts
+- For Google OAuth: mount your tokens directory:
+  ```bash
+  -v ~/.octa/tokens:/home/octa/.octa/tokens:ro
+  ```
+
+---
+
+## 📁 Directory Structure
+
+```
+~/.octa/
+├── config.json          # Your configuration
+├── tokens/
+│   └── google.json      # Google OAuth token
+├── data/
+│   └── scheduler.db     # SQLite: email queue + RSS cache
+└── workspace/
+    ├── AGENT.md         # Agent instructions + tool rules
+    ├── IDENTITY.md      # Agent identity
+    ├── SOUL.md          # Agent personality
+    ├── USER.md          # Your profile and preferences
+    ├── TOOLS.md         # Tool calling rules
+    ├── memory/          # Long-term memory
+    └── sessions/        # Conversation history
+```
+
+---
+
+## ⚙️ Configuration Reference
+
+Full example: [`config/config.example.json`](config/config.example.json)
+
+### Minimal config
+
+```json
+{
+  "agents": {
+    "defaults": {
+      "model": "gemini-2.0-flash",
+      "max_tokens": 8192,
+      "max_tool_iterations": 20
+    }
+  },
+  "model_list": [
     {
-      "type": "telegram",
-      "token": "YOUR_TELEGRAM_BOT_TOKEN"
+      "model_name": "gemini-2.0-flash",
+      "api_base": "https://generativelanguage.googleapis.com/v1beta/openai/",
+      "api_key": "YOUR_API_KEY",
+      "model": "gemini-2.0-flash"
     }
   ]
 }
+```
+
+### With Telegram bot + Google tools + Todoist
+
+```json
+{
+  "agents": {
+    "defaults": {
+      "model": "gemini-2.0-flash",
+      "max_tokens": 8192,
+      "max_tool_iterations": 20
+    }
+  },
+  "model_list": [
+    {
+      "model_name": "gemini-2.0-flash",
+      "api_base": "https://generativelanguage.googleapis.com/v1beta/openai/",
+      "api_key": "YOUR_GEMINI_KEY",
+      "model": "gemini-2.0-flash"
+    }
+  ],
+  "channels": {
+    "telegram": {
+      "enabled": true,
+      "token": "YOUR_TELEGRAM_BOT_TOKEN",
+      "allowed_users": ["your_telegram_username"]
+    }
+  },
+  "integrations": {
+    "google": {
+      "client_id": "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com",
+      "client_secret": "YOUR_GOOGLE_CLIENT_SECRET",
+      "redirect_uri": "http://127.0.0.1:8080/oauth/callback",
+      "token_file": "~/.octa/tokens/google.json",
+      "scopes": [
+        "https://www.googleapis.com/auth/calendar",
+        "https://www.googleapis.com/auth/gmail.modify"
+      ]
+    },
+    "todoist": {
+      "api_token": "YOUR_TODOIST_API_TOKEN"
+    }
+  }
+}
+```
+
+---
+
+## 🖥️ CLI Commands
+
+```bash
+octa agent              # Start interactive terminal session
+octa agent -m "msg"     # One-shot message
+octa agent --model X    # Use a specific model for this session
+octa gateway            # Start gateway (Telegram/Discord/Slack bot + background jobs)
+octa auth google        # Run Google OAuth flow
+octa status             # Show status
+octa cron               # Manage scheduled tasks
+octa skills             # Manage skills (install, list, remove)
+octa migrate            # Migrate from OpenClaw config format
+octa version            # Show version
+```
+
+---
+
+## 🧩 Skills
+
+Skills are markdown files that extend Octa's capabilities with custom instructions and scripts.
+
+```bash
+# Install a skill from the community hub
+octa skills install weather
+
+# List installed skills
+octa skills list
+
+# Remove a skill
+octa skills remove weather
 ```
 
 ---
@@ -240,56 +480,62 @@ Add channel config to `~/.octa/config.json`:
 ## 🏗️ Architecture
 
 ```
-octa agent
-  └── AgentLoop (pkg/agent/loop.go)
-        ├── Parallel Tool Execution (goroutines + WaitGroup)
-        ├── Google Calendar Tool   (lazy init)
-        ├── Gmail Tool             (with email scheduler)
-        ├── Todoist Tool           (bulk API calls)
-        ├── RSS Feed Tool          (SQLite backed)
-        ├── Cron Tool              (persistent jobs)
-        ├── Shell Tool             (sandboxed)
-        └── Web Search Tool
-```
+┌─────────────────────────────────────────────┐
+│                   Channels                   │
+│  Telegram │ Discord │ Slack │ CLI │ WhatsApp │
+└──────────────────┬──────────────────────────┘
+                   │ messages
+                   ▼
+┌──────────────────────────────────────────────┐
+│              Message Bus (pkg/bus)            │
+└──────────────────┬───────────────────────────┘
+                   │
+                   ▼
+┌──────────────────────────────────────────────┐
+│           Agent Loop (pkg/agent)             │
+│  Session → System Prompt → LLM → Tool Calls  │
+└──────────────────┬───────────────────────────┘
+                   │ parallel execution
+        ┌──────────┼──────────┐
+        ▼          ▼          ▼
+   Calendar      Gmail     Todoist    RSS ...
+                   
+┌──────────────────────────────────────────────┐
+│         Shared Scheduler (pkg/scheduler)      │
+│  email_dispatch │ meeting_reminder │ rss_fetch│
+└──────────────────────────────────────────────┘
 
----
-
-## 🛠️ Supported Providers
-
-| Provider | Models |
-|---|---|
-| **OpenAI** | gpt-4o, gpt-4o-mini, gpt-4-turbo, o1, o3 |
-| **Anthropic** | claude-3-5-sonnet, claude-3-opus, claude-3-haiku |
-| **Google Antigravity** | gemini-2.0-flash, gemini-1.5-pro |
-| **OpenAI-Compatible** | Any local or cloud endpoint (Ollama, LM Studio, etc.) |
-
----
-
-## 📁 Data & Storage
-
-All data is stored locally in `~/.octa/`:
-
-```
-~/.octa/
-├── config.json          # Main configuration
-├── tokens/
-│   └── google.json      # Google OAuth token
-├── data/
-│   └── scheduler.db     # Email queue + RSS feeds (SQLite)
-└── workspace/
-    ├── sessions/         # Conversation history
-    ├── cron/             # Cron job definitions
-    └── memory/           # Agent memory
+┌──────────────────────────────────────────────┐
+│         Shared SQLite Pool (pkg/db)           │
+│      email queue + RSS cache (sync.Once)      │
+└──────────────────────────────────────────────┘
 ```
 
 ---
 
 ## 🤝 Contributing
 
-Pull requests are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) first.
+Contributions are welcome! Please read the contributing guidelines before submitting a PR.
+
+```bash
+# Run tests
+make test
+
+# Run linter
+make lint
+
+# Format code
+make fmt
+```
 
 ---
 
 ## 📄 License
 
 MIT License — see [LICENSE](LICENSE) for details.
+
+---
+
+<div align="center">
+Made with 🐙 by <a href="https://github.com/Swarup012">Swarup</a>
+</div>

@@ -11,10 +11,79 @@ import (
 	"regexp"
 	"runtime"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/Swarup012/solo/pkg/config"
 )
+
+// Permission tracks the granted execution permission for a channel/chatID.
+type Permission struct {
+	expiresAt   time.Time
+	accessLevel AccessLevel
+	isOneTime   bool
+}
+
+var (
+	sudoMu    sync.RWMutex
+	sudoTrust = make(map[string]Permission)
+)
+
+// GrantExecSudo grants execution permission with the specified duration and access level.
+// isOneTime: if true, permission is revoked after first execution (for one-time approval)
+func GrantExecSudo(channel, chatID string, duration time.Duration, level AccessLevel) {
+	sudoMu.Lock()
+	defer sudoMu.Unlock()
+	// Treat short durations (under 2 minutes) as one-time approval
+	// /approve = 60s, /approve once = 60s → one-time
+	// /approve 5m = 300s → NOT one-time, lasts full duration
+	isOneTime := duration < 2*time.Minute
+	sudoTrust[channel+":"+chatID] = Permission{
+		expiresAt:   time.Now().Add(duration),
+		accessLevel: level,
+		isOneTime:   isOneTime,
+	}
+}
+
+// RevokeExecSudo revokes execution permission for a channel/chatID.
+func RevokeExecSudo(channel, chatID string) {
+	sudoMu.Lock()
+	defer sudoMu.Unlock()
+	delete(sudoTrust, channel+":"+chatID)
+}
+
+// HasExecSudo checks if a channel/chatID has valid execution permission.
+// Returns the permission status and the granted access level.
+func HasExecSudo(channel, chatID string) (bool, AccessLevel) {
+	sudoMu.RLock()
+	defer sudoMu.RUnlock()
+	perm, ok := sudoTrust[channel+":"+chatID]
+	if !ok || time.Now().After(perm.expiresAt) {
+		return false, AccessWorkspace
+	}
+	return true, perm.accessLevel
+}
+
+// HasExecSudoOneTime checks if the current permission is one-time and returns the permission status.
+func HasExecSudoOneTime(channel, chatID string) (bool, bool) {
+	sudoMu.RLock()
+	defer sudoMu.RUnlock()
+	perm, ok := sudoTrust[channel+":"+chatID]
+	if !ok || time.Now().After(perm.expiresAt) {
+		return false, false
+	}
+	return true, perm.isOneTime
+}
+
+// RevokeExecSudoOneTime revokes a one-time permission after execution.
+func RevokeExecSudoOneTime(channel, chatID string) {
+	sudoMu.Lock()
+	defer sudoMu.Unlock()
+	perm, ok := sudoTrust[channel+":"+chatID]
+	if ok && perm.isOneTime {
+		delete(sudoTrust, channel+":"+chatID)
+	}
+}
 
 type ExecTool struct {
 	workingDir          string
@@ -22,6 +91,13 @@ type ExecTool struct {
 	denyPatterns        []*regexp.Regexp
 	allowPatterns       []*regexp.Regexp
 	restrictToWorkspace bool
+	channel             string
+	chatID              string
+}
+
+func (t *ExecTool) SetContext(channel, chatID string) {
+	t.channel = channel
+	t.chatID = chatID
 }
 
 var defaultDenyPatterns = []*regexp.Regexp{
@@ -141,12 +217,30 @@ func (t *ExecTool) Execute(ctx context.Context, args map[string]any) *ToolResult
 
 	cwd := t.workingDir
 	if wd, ok := args["working_dir"].(string); ok && wd != "" {
+		// Check danger zones first (always blocked)
+		if isDangerZone(wd) {
+			return ErrorResult("Command blocked by safety guard (danger zone: " + wd + " is protected)")
+		}
+
 		if t.restrictToWorkspace && t.workingDir != "" {
-			resolvedWD, err := validatePath(wd, t.workingDir, true)
-			if err != nil {
-				return ErrorResult("Command blocked by safety guard (" + err.Error() + ")")
+			// Check if user has elevated permission
+			hasSudo, accessLevel := HasExecSudo(t.channel, t.chatID)
+			if hasSudo && accessLevel == AccessUnrestricted {
+				// Allow any working directory
+				absWD, err := filepath.Abs(wd)
+				if err == nil {
+					cwd = absWD
+				} else {
+					cwd = wd
+				}
+			} else {
+				// Apply workspace restriction
+				resolvedWD, err := validatePath(wd, t.workingDir, true)
+				if err != nil {
+					return ErrorResult("Command blocked by safety guard (" + err.Error() + ")")
+				}
+				cwd = resolvedWD
 			}
-			cwd = resolvedWD
 		} else {
 			cwd = wd
 		}
@@ -161,6 +255,16 @@ func (t *ExecTool) Execute(ctx context.Context, args map[string]any) *ToolResult
 
 	if guardError := t.guardCommand(command, cwd); guardError != "" {
 		return ErrorResult(guardError)
+	}
+
+	// Sudo Timer Check
+	hasSudo, _ := HasExecSudo(t.channel, t.chatID)
+	if !hasSudo {
+		return &ToolResult{
+			ForLLM:  "Shell execution requires user approval. Tell the user you need permission to run shell commands and ask them to reply with 'approve' for one-time or 'approve 5m' for 5 minutes. Do NOT retry the command until the user grants approval.",
+			ForUser: "",
+			IsError: false,
+		}
 	}
 
 	// timeout == 0 means no timeout
@@ -240,12 +344,17 @@ func (t *ExecTool) Execute(ctx context.Context, args map[string]any) *ToolResult
 	}
 
 	if err != nil {
+		// Revoke one-time permission even on error
+		RevokeExecSudoOneTime(t.channel, t.chatID)
 		return &ToolResult{
 			ForLLM:  output,
 			ForUser: output,
 			IsError: true,
 		}
 	}
+
+	// Revoke one-time permission after successful execution
+	RevokeExecSudoOneTime(t.channel, t.chatID)
 
 	return &ToolResult{
 		ForLLM:  output,
@@ -258,6 +367,7 @@ func (t *ExecTool) guardCommand(command, cwd string) string {
 	cmd := strings.TrimSpace(command)
 	lower := strings.ToLower(cmd)
 
+	// Check deny patterns (ALWAYS checked, even with approval)
 	for _, pattern := range t.denyPatterns {
 		if pattern.MatchString(lower) {
 			return "Command blocked by safety guard (dangerous pattern detected)"
@@ -277,7 +387,25 @@ func (t *ExecTool) guardCommand(command, cwd string) string {
 		}
 	}
 
+	// Check danger zones (ALWAYS checked, even with approval)
+	pathPattern := regexp.MustCompile(`[A-Za-z]:\\[^\\\"']+|/[^\s\"']+`)
+	matches := pathPattern.FindAllString(cmd, -1)
+
+	for _, raw := range matches {
+		if isDangerZone(raw) {
+			return "Command blocked by safety guard (danger zone: " + raw + " is protected)"
+		}
+	}
+
+	// Check workspace restriction (conditional, skipped with elevated permission)
 	if t.restrictToWorkspace {
+		hasSudo, accessLevel := HasExecSudo(t.channel, t.chatID)
+		if hasSudo && accessLevel == AccessUnrestricted {
+			// Skip workspace checks - user has elevated permission
+			return ""
+		}
+
+		// Apply workspace restrictions
 		if strings.Contains(cmd, "..\\") || strings.Contains(cmd, "../") {
 			return "Command blocked by safety guard (path traversal detected)"
 		}
@@ -286,9 +414,6 @@ func (t *ExecTool) guardCommand(command, cwd string) string {
 		if err != nil {
 			return ""
 		}
-
-		pathPattern := regexp.MustCompile(`[A-Za-z]:\\[^\\\"']+|/[^\s\"']+`)
-		matches := pathPattern.FindAllString(cmd, -1)
 
 		for _, raw := range matches {
 			p, err := filepath.Abs(raw)

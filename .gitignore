@@ -45,3 +45,8 @@ Thumbs.db
 tmp_rovodev_*
 tmp_*/
 *.tmp
+.context-engine/
+
+# ── Project.md ───────────────────────────────────────────────────────────────
+Project.md
+

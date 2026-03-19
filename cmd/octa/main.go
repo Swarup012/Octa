@@ -16,6 +16,7 @@ import (
 	"github.com/Swarup012/solo/cmd/octa/internal/agent"
 	"github.com/Swarup012/solo/cmd/octa/internal/auth"
 	"github.com/Swarup012/solo/cmd/octa/internal/cron"
+	"github.com/Swarup012/solo/cmd/octa/internal/dashboard"
 	"github.com/Swarup012/solo/cmd/octa/internal/gateway"
 	"github.com/Swarup012/solo/cmd/octa/internal/migrate"
 	"github.com/Swarup012/solo/cmd/octa/internal/onboard"
@@ -38,6 +39,7 @@ func NewPicoclawCommand() *cobra.Command {
 		agent.NewAgentCommand(),
 		auth.NewAuthCommand(),
 		gateway.NewGatewayCommand(),
+		dashboard.NewDashboardCommand(),
 		status.NewStatusCommand(),
 		cron.NewCronCommand(),
 		migrate.NewMigrateCommand(),
