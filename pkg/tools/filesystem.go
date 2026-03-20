@@ -152,10 +152,11 @@ func (t *ReadFileTool) Execute(ctx context.Context, args map[string]any) *ToolRe
 				// Path is outside workspace - check for permission
 				hasSudo, accessLevel := HasExecSudo(t.channel, t.chatID)
 				if !hasSudo || accessLevel != AccessUnrestricted {
-					// No permission - ask for approval
+					// No permission - ask for approval with formatted prompt
+					prompt := BuildFileOperationPermissionPrompt("Read file", path)
 					return &ToolResult{
-						ForLLM:  "File operation outside workspace requires user approval. Tell the user you need permission for this operation and ask them to reply with 'approve' for one-time or 'approve 5m' for 5 minutes. Do NOT retry the operation until the user grants approval.",
-						ForUser: "",
+						ForLLM:  prompt + "\n\nDo NOT retry the operation until the user grants approval.",
+						ForUser: prompt,
 						IsError: false,
 					}
 				}
@@ -256,10 +257,11 @@ func (t *WriteFileTool) Execute(ctx context.Context, args map[string]any) *ToolR
 				// Path is outside workspace - check for permission
 				hasSudo, accessLevel := HasExecSudo(t.channel, t.chatID)
 				if !hasSudo || accessLevel != AccessUnrestricted {
-					// No permission - ask for approval
+					// No permission - ask for approval with formatted prompt
+					prompt := BuildFileOperationPermissionPrompt("Write file", path)
 					return &ToolResult{
-						ForLLM:  "File operation outside workspace requires user approval. Tell the user you need permission for this operation and ask them to reply with 'approve' for one-time or 'approve 5m' for 5 minutes. Do NOT retry the operation until the user grants approval.",
-						ForUser: "",
+						ForLLM:  prompt + "\n\nDo NOT retry the operation until the user grants approval.",
+						ForUser: prompt,
 						IsError: false,
 					}
 				}
@@ -351,10 +353,11 @@ func (t *ListDirTool) Execute(ctx context.Context, args map[string]any) *ToolRes
 				// Path is outside workspace - check for permission
 				hasSudo, accessLevel := HasExecSudo(t.channel, t.chatID)
 				if !hasSudo || accessLevel != AccessUnrestricted {
-					// No permission - ask for approval
+					// No permission - ask for approval with formatted prompt
+					prompt := BuildFileOperationPermissionPrompt("List directory", path)
 					return &ToolResult{
-						ForLLM:  "File operation outside workspace requires user approval. Tell the user you need permission for this operation and ask them to reply with 'approve' for one-time or 'approve 5m' for 5 minutes. Do NOT retry the operation until the user grants approval.",
-						ForUser: "",
+						ForLLM:  prompt + "\n\nDo NOT retry the operation until the user grants approval.",
+						ForUser: prompt,
 						IsError: false,
 					}
 				}

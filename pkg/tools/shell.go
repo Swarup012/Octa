@@ -260,9 +260,11 @@ func (t *ExecTool) Execute(ctx context.Context, args map[string]any) *ToolResult
 	// Sudo Timer Check
 	hasSudo, _ := HasExecSudo(t.channel, t.chatID)
 	if !hasSudo {
+		// Use formatted prompt
+		prompt := BuildShellExecutionDenied()
 		return &ToolResult{
-			ForLLM:  "Shell execution requires user approval. Tell the user you need permission to run shell commands and ask them to reply with 'approve' for one-time or 'approve 5m' for 5 minutes. Do NOT retry the command until the user grants approval.",
-			ForUser: "",
+			ForLLM:  prompt + "\n\nDo NOT retry the command until the user grants approval.",
+			ForUser: prompt,
 			IsError: false,
 		}
 	}
