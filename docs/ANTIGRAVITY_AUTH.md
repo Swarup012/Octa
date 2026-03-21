@@ -383,7 +383,7 @@ const antigravityPlugin = {
   description: "OAuth flow for Google Antigravity (Cloud Code Assist)",
   configSchema: emptyPluginConfigSchema(),
   
-  register(api: PicoClawPluginApi) {
+  register(api: OctaPluginApi) {
     api.registerProvider({
       id: "google-antigravity",
       label: "Google Antigravity",
@@ -410,7 +410,7 @@ const antigravityPlugin = {
 
 ```typescript
 type ProviderAuthContext = {
-  config: PicoClawConfig;
+  config: OctaConfig;
   agentDir?: string;
   workspaceDir?: string;
   prompter: WizardPrompter;      // UI prompts/notifications
@@ -431,7 +431,7 @@ type ProviderAuthResult = {
     profileId: string;
     credential: AuthProfileCredential;
   }>;
-  configPatch?: Partial<PicoClawConfig>;
+  configPatch?: Partial<OctaConfig>;
   defaultModel?: string;
   notes?: string[];
 };
@@ -444,7 +444,7 @@ type ProviderAuthResult = {
 ### 1. Required Environment/Dependencies
 
 - Go ≥ 1.21
-- PicoClaw codebase (`pkg/providers/` and `pkg/auth/`)
+- Octa codebase (`pkg/providers/` and `pkg/auth/`)
 - `crypto` and `net/http` standard library packages
 
 ### 2. Required Headers for API Calls
@@ -597,7 +597,7 @@ Each SSE message (`data: {...}`) is wrapped in a `response` field:
 
 ### Auth Profile Storage
 
-Auth profiles are stored in `~/.picoclaw/auth.json`:
+Auth profiles are stored in `~/.octa/auth.json`:
 
 ```json
 {
@@ -617,9 +617,9 @@ Auth profiles are stored in `~/.picoclaw/auth.json`:
 
 ---
 
-## Creating a New Provider in PicoClaw
+## Creating a New Provider in Octa
 
-PicoClaw providers are implemented as Go packages under `pkg/providers/`. To add a new provider:
+Octa providers are implemented as Go packages under `pkg/providers/`. To add a new provider:
 
 ### Step-by-Step Implementation
 
@@ -679,7 +679,7 @@ Add a default entry in `pkg/config/defaults.go`:
 
 #### 5. Add Auth Support (Optional)
 
-If your provider requires OAuth or special authentication, add a case to `cmd/picoclaw/cmd_auth.go`:
+If your provider requires OAuth or special authentication, add a case to `cmd/octa/cmd_auth.go`:
 
 ```go
 case "your-provider":
@@ -709,26 +709,26 @@ case "your-provider":
 
 ```bash
 # Authenticate with a provider
-picoclaw auth login --provider your-provider
+octa auth login --provider your-provider
 
 # List models (for Antigravity)
-picoclaw auth models
+octa auth models
 
 # Start the gateway
-picoclaw gateway
+octa gateway
 
 # Run an agent with a specific model
-picoclaw agent -m "Hello" --model your-model
+octa agent -m "Hello" --model your-model
 ```
 
 ### Environment Variables for Testing
 
 ```bash
 # Override default model
-export PICOCLAW_AGENTS_DEFAULTS_MODEL=your-model
+export OCTA_AGENTS_DEFAULTS_MODEL=your-model
 
 # Override provider settings
-export PICOCLAW_MODEL_LIST='[{"model_name":"your-model","model":"your-provider/model-name","api_key":"..."}]'
+export OCTA_MODEL_LIST='[{"model_name":"your-model","model":"your-provider/model-name","api_key":"..."}]'
 ```
 
 ---
@@ -738,10 +738,10 @@ export PICOCLAW_MODEL_LIST='[{"model_name":"your-model","model":"your-provider/m
 - **Source Files:**
   - `pkg/providers/antigravity_provider.go` - Antigravity provider implementation
   - `pkg/auth/oauth.go` - OAuth flow implementation
-  - `pkg/auth/store.go` - Auth credential storage (`~/.picoclaw/auth.json`)
+  - `pkg/auth/store.go` - Auth credential storage (`~/.octa/auth.json`)
   - `pkg/providers/factory.go` - Provider factory and protocol routing
   - `pkg/providers/types.go` - Provider interface definitions
-  - `cmd/picoclaw/cmd_auth.go` - Auth CLI commands
+  - `cmd/octa/cmd_auth.go` - Auth CLI commands
 
 - **Documentation:**
   - `docs/ANTIGRAVITY_USAGE.md` - Antigravity usage guide
@@ -797,7 +797,7 @@ Some models might show up in the available models list but return an empty respo
 ## Troubleshooting
 
 ### "Token expired"
-- Refresh OAuth tokens: `picoclaw auth login --provider antigravity`
+- Refresh OAuth tokens: `octa auth login --provider antigravity`
 
 ### "Gemini for Google Cloud is not enabled"
 - Enable the API in your Google Cloud Console
@@ -808,5 +808,5 @@ Some models might show up in the available models list but return an empty respo
 
 ### Models not appearing in list
 - Verify OAuth authentication completed successfully
-- Check auth profile storage: `~/.picoclaw/auth.json`
-- Re-run `picoclaw auth login --provider antigravity`
+- Check auth profile storage: `~/.octa/auth.json`
+- Re-run `octa auth login --provider antigravity`

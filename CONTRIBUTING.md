@@ -62,7 +62,7 @@ Use [Conventional Commits](https://www.conventionalcommits.org/):
 feat: add Notion integration tool
 fix: gmail duplicate send on schedule
 docs: update Google auth instructions
-refactor: rename cmd/picoclaw to cmd/octa
+refactor: rename cmd/octa to cmd/octa
 chore: update dependencies
 ```
 

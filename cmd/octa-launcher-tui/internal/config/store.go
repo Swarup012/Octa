@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	picoclawconfig "github.com/Swarup012/solo/pkg/config"
+	octaconfig "github.com/Swarup012/solo/pkg/config"
 )
 
 const (
@@ -29,15 +29,15 @@ func ConfigDir() (string, error) {
 	return filepath.Join(home, configDirName), nil
 }
 
-func Load() (*picoclawconfig.Config, error) {
+func Load() (*octaconfig.Config, error) {
 	path, err := ConfigPath()
 	if err != nil {
 		return nil, err
 	}
-	return picoclawconfig.LoadConfig(path)
+	return octaconfig.LoadConfig(path)
 }
 
-func Save(cfg *picoclawconfig.Config) error {
+func Save(cfg *octaconfig.Config) error {
 	if cfg == nil {
 		return errors.New("config is nil")
 	}
@@ -45,5 +45,5 @@ func Save(cfg *picoclawconfig.Config) error {
 	if err != nil {
 		return err
 	}
-	return picoclawconfig.SaveConfig(path, cfg)
+	return octaconfig.SaveConfig(path, cfg)
 }

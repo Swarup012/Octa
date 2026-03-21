@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/Swarup012/solo/cmd/picoclaw-launcher-tui/internal/ui"
+	"github.com/Swarup012/solo/cmd/octa-launcher-tui/internal/ui"
 )
 
 func main() {

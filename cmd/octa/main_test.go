@@ -11,12 +11,12 @@ import (
 	"github.com/Swarup012/solo/cmd/octa/internal"
 )
 
-func TestNewPicoclawCommand(t *testing.T) {
-	cmd := NewPicoclawCommand()
+func TestNewOctaCommand(t *testing.T) {
+	cmd := NewOctaCommand()
 
 	require.NotNil(t, cmd)
 
-	short := fmt.Sprintf("%s picoclaw - Personal AI Assistant v%s\n\n", internal.Logo, internal.GetVersion())
+	short := fmt.Sprintf("%s octa - Personal AI Assistant v%s\n\n", internal.Logo, internal.GetVersion())
 
 	assert.Equal(t, "octa", cmd.Use)
 	assert.Equal(t, short, cmd.Short)

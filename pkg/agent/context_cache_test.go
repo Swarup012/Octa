@@ -15,7 +15,7 @@ import (
 // Returns the tmpDir path; caller should defer os.RemoveAll(tmpDir).
 func setupWorkspace(t *testing.T, files map[string]string) string {
 	t.Helper()
-	tmpDir, err := os.MkdirTemp("", "picoclaw-test-*")
+	tmpDir, err := os.MkdirTemp("", "octa-test-*")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -102,7 +102,7 @@ func TestSingleSystemMessage(t *testing.T) {
 
 			// System message must contain identity (static) and time (dynamic)
 			sys := msgs[0].Content
-			if !strings.Contains(sys, "picoclaw") {
+			if !strings.Contains(sys, "octa") {
 				t.Error("system message missing identity")
 			}
 			if !strings.Contains(sys, "Current Time") {
@@ -414,7 +414,7 @@ func TestConcurrentBuildSystemPromptWithCache(t *testing.T) {
 					errs <- "empty prompt returned"
 					return
 				}
-				if !strings.Contains(result, "picoclaw") {
+				if !strings.Contains(result, "octa") {
 					errs <- "prompt missing identity"
 					return
 				}
@@ -491,7 +491,7 @@ func TestEmptyWorkspaceBaselineDetectsNewFiles(t *testing.T) {
 
 // BenchmarkBuildMessagesWithCache measures caching performance.
 func BenchmarkBuildMessagesWithCache(b *testing.B) {
-	tmpDir, _ := os.MkdirTemp("", "picoclaw-bench-*")
+	tmpDir, _ := os.MkdirTemp("", "octa-bench-*")
 	defer os.RemoveAll(tmpDir)
 
 	os.MkdirAll(filepath.Join(tmpDir, "memory"), 0o755)

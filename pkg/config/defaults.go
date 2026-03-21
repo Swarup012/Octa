@@ -1,11 +1,11 @@
-// PicoClaw - Ultra-lightweight personal AI agent
+// Octa - Ultra-lightweight personal AI agent
 // License: MIT
 //
-// Copyright (c) 2026 PicoClaw contributors
+// Copyright (c) 2026 Octa contributors
 
 package config
 
-// DefaultConfig returns the default configuration for PicoClaw.
+// DefaultConfig returns the default configuration for Octa.
 func DefaultConfig() *Config {
 	return &Config{
 		Agents: AgentsConfig{

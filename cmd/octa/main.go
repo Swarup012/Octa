@@ -25,7 +25,7 @@ import (
 	"github.com/Swarup012/solo/cmd/octa/internal/version"
 )
 
-func NewPicoclawCommand() *cobra.Command {
+func NewOctaCommand() *cobra.Command {
 	short := fmt.Sprintf("%s octa - Personal AI Assistant v%s\n\n", internal.Logo, internal.GetVersion())
 
 	cmd := &cobra.Command{
@@ -51,7 +51,7 @@ func NewPicoclawCommand() *cobra.Command {
 }
 
 func main() {
-	cmd := NewPicoclawCommand()
+	cmd := NewOctaCommand()
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)
 	}

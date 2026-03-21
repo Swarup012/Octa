@@ -7,7 +7,7 @@ import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 
-	picoclawconfig "github.com/Swarup012/solo/pkg/config"
+	octaconfig "github.com/Swarup012/solo/pkg/config"
 )
 
 func (s *appState) channelMenu() tview.Primitive {
@@ -529,7 +529,7 @@ func wrapWithBack(form *tview.Form, s *appState) tview.Primitive {
 	return form
 }
 
-func splitCSV(input string) picoclawconfig.FlexibleStringSlice {
+func splitCSV(input string) octaconfig.FlexibleStringSlice {
 	parts := strings.Split(strings.TrimSpace(input), ",")
 	cleaned := make([]string, 0, len(parts))
 	for _, part := range parts {

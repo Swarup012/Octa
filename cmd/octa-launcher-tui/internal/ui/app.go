@@ -9,15 +9,15 @@ import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 
-	configstore "github.com/Swarup012/solo/cmd/picoclaw-launcher-tui/internal/config"
-	picoclawconfig "github.com/Swarup012/solo/pkg/config"
+	configstore "github.com/Swarup012/solo/cmd/octa-launcher-tui/internal/config"
+	octaconfig "github.com/Swarup012/solo/pkg/config"
 )
 
 type appState struct {
 	app         *tview.Application
 	pages       *tview.Pages
 	stack       []string
-	config      *picoclawconfig.Config
+	config      *octaconfig.Config
 	configPath  string
 	gatewayCmd  *exec.Cmd
 	menus       map[string]*Menu
@@ -40,7 +40,7 @@ func Run() error {
 	}
 
 	if cfg == nil {
-		cfg = picoclawconfig.DefaultConfig()
+		cfg = octaconfig.DefaultConfig()
 	}
 
 	originalData, hasOriginal := loadOriginalConfig(path)

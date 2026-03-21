@@ -31,7 +31,7 @@ func RegisterProcessAPI(mux *http.ServeMux, absPath string) {
 }
 
 func handleStartGateway(w http.ResponseWriter, r *http.Request) {
-	// Locate picoclaw executable:
+	// Locate octa executable:
 	// 1. Try same directory as current executable
 	// 2. Fallback to just "octa" (relies on $PATH)
 	execPath := "octa"
@@ -106,9 +106,9 @@ func scanPipe(r io.Reader, buf *LogBuffer) {
 func handleStopGateway(w http.ResponseWriter, r *http.Request) {
 	var err error
 	if runtime.GOOS == "windows" {
-		// Kill via taskkill finding picoclaw.exe (though it might kill this config tool if it's named picoclaw-launcher.exe...? No, /IM does exact match usually, but just to be safe let's stop exactly picoclaw.exe)
+		// Kill via taskkill finding octa.exe (though it might kill this config tool if it's named octa-launcher.exe...? No, /IM does exact match usually, but just to be safe let's stop exactly octa.exe)
 		// Alternatively, we use powershell to kill processes with commandline containing 'gateway'
-		psCmd := `Get-WmiObject Win32_Process | Where-Object { $_.CommandLine -match 'picoclaw.*gateway' } | ForEach-Object { Stop-Process $_.ProcessId -Force }`
+		psCmd := `Get-WmiObject Win32_Process | Where-Object { $_.CommandLine -match 'octa.*gateway' } | ForEach-Object { Stop-Process $_.ProcessId -Force }`
 		err = exec.Command("powershell", "-Command", psCmd).Run()
 	} else {
 		// Linux/macOS

@@ -2,43 +2,87 @@
 
 # 🐙 Octa
 
-**Your personal AI agent — lightweight, fast, and runs everywhere.**
+**Your personal AI agent — it talks, it acts, it remembers.**
 
 [![Go](https://img.shields.io/badge/Go-1.21+-00ADD8?style=flat&logo=go)](https://golang.org)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Build](https://img.shields.io/github/actions/workflow/status/Swarup012/solo/build.yml?branch=main)](https://github.com/Swarup012/solo/actions)
+[![Build](https://img.shields.io/github/actions/workflow/status/Swarup012/Octa/build.yml?branch=main)](https://github.com/Swarup012/Octa/actions)
 
-[Features](#-features) • [Quick Start](#-quick-start) • [Configuration](#-configuration) • [Docker](#-docker) • [Tools](#-built-in-tools) • [Channels](#-messaging-channels)
+[What is this?](#-what-is-octa) • [Why use it?](#-why-octa) • [Use cases](#-how-octa-helps) • [Get started](#-quick-start) • [Docker](#-docker) • [Reference](#-reference)
 
 </div>
 
 ---
 
-## What is Octa?
+## 💡 What is Octa?
 
-Octa is a **personal AI agent** written in Go. It connects to your favourite LLM (Claude, Gemini, GPT-4, Llama) and gives it real tools — Google Calendar, Gmail, Todoist, RSS feeds, web search, shell access, and more.
+Octa is a **personal AI agent** that runs on your own machine. You pick an LLM (Claude, Gemini, GPT-4, Llama — your choice), and Octa gives it hands: it can check your calendar, send emails, manage tasks, search the web, play music, run shell commands, and much more.
 
-You talk to Octa through Telegram, Discord, Slack, WhatsApp, or directly from your terminal. It remembers context, runs scheduled tasks in the background, and executes multiple tools **in parallel** for fast responses.
+You talk to Octa through **Telegram, Discord, Slack, WhatsApp**, or just your terminal. It remembers your conversations, runs background jobs on a schedule, and executes multiple tools in parallel so responses feel instant.
 
-Inspired by [OpenClaw](https://github.com/OpenClaw-project) and [PicoClaw](https://github.com/PicoClaw-project). Built for people who want a capable personal assistant that runs on their own machine, with their own API keys, under their own control.
+No cloud subscription. No data leaving your machine. Your keys, your rules.
 
 ---
 
-## ✨ Features
+## 🔥 Why Octa?
 
-- 🧠 **Multi-provider LLM** — Claude, Gemini, GPT-4, OpenRouter, Llama, and more
-- ⚡ **Parallel tool execution** — multiple tools run simultaneously in one response
-- 🎵 **Music playback** — play YouTube audio via mpv + yt-dlp with queue, volume, pause/resume
-- 📅 **Google Calendar** — create, list, update, delete events + Google Meet
-- 📧 **Gmail** — send, schedule, search, read emails
-- ✅ **Todoist** — full task management (create, complete, bulk operations)
-- 📰 **RSS Feed Reader** — subscribe, fetch, notify on new articles
-- 🌐 **Web Search & Fetch** — search the web and read pages
-- 🖥️ **Shell** — run terminal commands
-- 💬 **Multiple channels** — Telegram, Discord, Slack, WhatsApp, DingTalk, Feishu, LINE
-- ⏰ **Background scheduler** — email dispatch, meeting reminders, RSS fetch
-- 🧩 **Skills system** — install community skills to extend capabilities
-- 🐳 **Docker ready** — run as a container in seconds
+You've used ChatGPT. You've used Claude. They're great — until you realize they can't *do* anything. They can't check your calendar. They can't send that email you drafted. They can't look up your todos and remind you before the meeting.
+
+You end up copy-pasting between 10 tabs. Your AI assistant is just a chatbot with amnesia.
+
+**Octa fixes this.**
+
+| Problem | How Octa solves it |
+|---------|-------------------|
+| AI can't access your tools | Connects to Google Calendar, Gmail, Todoist, RSS feeds, and more |
+| AI forgets everything | Persistent sessions with automatic summarization |
+| AI is slow with multiple tasks | Parallel tool execution — runs 5 tools at once |
+| AI only works in one tab | Works on Telegram, Discord, Slack, WhatsApp, or terminal |
+| AI costs money every month | Runs on your machine with your own API keys (Gemini free tier works) |
+| AI can't do background work | Built-in scheduler for reminders, email dispatch, RSS polling |
+
+---
+
+## 🎯 How Octa Helps
+
+Here are real things people do with Octa every day:
+
+### Morning routine
+> "What's on my calendar today? Any urgent emails? What tasks are due?"
+
+Octa checks your Google Calendar, scans your Gmail inbox, and pulls your Todoist tasks — all in one response, all in parallel.
+
+### Quick actions from chat
+> "Schedule a meeting with Alex tomorrow at 3pm"
+> "Send an email to the team: standup is cancelled today"
+> "Add 'buy groceries' to my todo list"
+
+No app switching. Just type it in Telegram/Discord and Octa handles it.
+
+### Stay informed
+> "Any new articles from Hacker News today?"
+> "Search the web for the latest Go 1.25 features"
+
+Octa's RSS reader auto-fetches feeds every 30 minutes and can summarize new articles on demand.
+
+### Background automation
+> "Remind me 10 minutes before every meeting"
+> "Email me a digest of unread RSS articles every morning at 8am"
+
+Octa's scheduler runs in the background — even when you're not chatting with it.
+
+### Music playback
+> "Play some lofi beats"
+> "Pause the music" / "Volume 50"
+
+Streams YouTube audio directly via mpv. No browser needed.
+
+### Developer power tools
+> "Run `docker ps` and show me the output"
+> "Check the logs on my server"
+> "Deploy the latest version"
+
+Shell access with safety guards — deny patterns block dangerous commands by default.
 
 ---
 
@@ -47,32 +91,32 @@ Inspired by [OpenClaw](https://github.com/OpenClaw-project) and [PicoClaw](https
 ### Prerequisites
 - Go 1.21 or later
 - Git
-- An API key for at least one LLM provider (Claude, Gemini, OpenRouter, etc.)
+- An API key for at least one LLM provider
 
-### 1. Clone and build
+### 1. Build and install
 
 ```bash
-git clone https://github.com/Swarup012/solo.git
-cd solo
+git clone https://github.com/Swarup012/Octa.git
+cd Octa
 make build
 make install
 ```
 
-This installs `octa` to `~/.local/bin/octa`. Make sure `~/.local/bin` is in your PATH:
+This installs `octa` to `~/.local/bin/octa`. Add it to your PATH:
 
 ```bash
 echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
 source ~/.bashrc
 ```
 
-### 2. Create your config
+### 2. Configure
 
 ```bash
 mkdir -p ~/.octa
 cp config/config.example.json ~/.octa/config.json
 ```
 
-Edit `~/.octa/config.json` with your API key. Minimum config to get started:
+Edit `~/.octa/config.json` — at minimum, add your API key:
 
 ```json
 {
@@ -94,6 +138,8 @@ Edit `~/.octa/config.json` with your API key. Minimum config to get started:
 }
 ```
 
+> **Tip:** Gemini has a free tier. Get your key at https://aistudio.google.com/app/apikey
+
 ### 3. Run
 
 ```bash
@@ -109,205 +155,23 @@ octa gateway
 
 ---
 
-## 🤖 LLM Providers
-
-Octa supports any OpenAI-compatible API. Add entries to `model_list` in your config:
-
-### Google Gemini (free tier available)
-
-```json
-{
-  "model_name": "gemini-2.0-flash",
-  "api_base": "https://generativelanguage.googleapis.com/v1beta/openai/",
-  "api_key": "YOUR_GEMINI_API_KEY",
-  "model": "gemini-2.0-flash"
-}
-```
-
-Get your key: https://aistudio.google.com/app/apikey
-
-### Anthropic Claude
-
-```json
-{
-  "model_name": "claude-sonnet",
-  "api_key": "sk-ant-YOUR_KEY",
-  "model": "claude-sonnet-4-5"
-}
-```
-
-### OpenRouter (access Claude, GPT-4, Gemini with one key)
-
-```json
-{
-  "model_name": "openrouter",
-  "api_base": "https://openrouter.ai/api/v1",
-  "api_key": "sk-or-v1-YOUR_KEY",
-  "model": "anthropic/claude-sonnet-4-5"
-}
-```
-
-Get your key: https://openrouter.ai
-
-### Ollama (local models — no API key needed)
-
-```json
-{
-  "model_name": "llama3",
-  "api_base": "http://localhost:11434/v1",
-  "api_key": "ollama",
-  "model": "llama3.1:8b"
-}
-```
-
----
-
-## 🛠️ Built-in Tools
-
-| Tool | What it does |
-|------|-------------|
-| `google_calendar` | Create, list, update, delete calendar events. Adds Google Meet by default. |
-| `gmail` | Send immediate or scheduled emails. Search, read inbox. |
-| `todoist` | Full task management — create (bulk), list, complete, delete, update. |
-| `rss` | Subscribe to RSS/Atom feeds. Auto-fetches every 30 min in gateway mode. |
-| `web_search` | Search the web using configured search API. |
-| `web_fetch` | Fetch and read the content of any URL. |
-| `shell` | Run shell commands on your machine. |
-| `youtube_music` | Play music from YouTube via mpv + yt-dlp. Supports play, pause, resume, stop, volume, queue. |
-| `message` | Send a message to the user from within a tool chain. |
-| `spawn` | Spawn a subagent to handle a subtask asynchronously. |
-| `cron` | Schedule recurring tasks. |
-
----
-
-## 📅 Google Calendar + Gmail Setup
-
-### 1. Create Google OAuth credentials
-
-1. Go to [Google Cloud Console](https://console.cloud.google.com)
-2. Create a new project (or use existing)
-3. Enable **Google Calendar API** and **Gmail API**
-4. Go to **APIs & Services → Credentials → Create OAuth 2.0 Client ID**
-5. Application type: **Desktop App**
-6. Download the credentials
-
-### 2. Add to config
-
-```json
-{
-  "integrations": {
-    "google": {
-      "client_id": "YOUR_CLIENT_ID.apps.googleusercontent.com",
-      "client_secret": "YOUR_CLIENT_SECRET",
-      "redirect_uri": "http://127.0.0.1:8080/oauth/callback",
-      "token_file": "~/.octa/tokens/google.json",
-      "scopes": [
-        "https://www.googleapis.com/auth/calendar",
-        "https://www.googleapis.com/auth/gmail.modify"
-      ]
-    }
-  }
-}
-```
-
-### 3. Authenticate
-
-```bash
-octa auth google
-```
-
-This opens a browser for OAuth. After approving, the token is saved to `~/.octa/tokens/google.json`.
-
----
-
-## ✅ Todoist Setup
-
-1. Go to https://todoist.com/app/settings/integrations → **API token**
-2. Add to config:
-
-```json
-{
-  "integrations": {
-    "todoist": {
-      "api_token": "YOUR_TODOIST_API_TOKEN"
-    }
-  }
-}
-```
-
-No OAuth needed — just the token.
-
----
-
-## 💬 Messaging Channels
-
-Run Octa as a bot on any of these platforms:
-
-### Telegram
-
-```json
-{
-  "channels": {
-    "telegram": {
-      "enabled": true,
-      "token": "YOUR_BOT_TOKEN",
-      "allowed_users": ["your_username"]
-    }
-  }
-}
-```
-
-Get a bot token from [@BotFather](https://t.me/BotFather).
-
-### Discord
-
-```json
-{
-  "channels": {
-    "discord": {
-      "enabled": true,
-      "token": "YOUR_DISCORD_BOT_TOKEN",
-      "allowed_channel_ids": ["CHANNEL_ID"]
-    }
-  }
-}
-```
-
-### Slack
-
-```json
-{
-  "channels": {
-    "slack": {
-      "enabled": true,
-      "bot_token": "xoxb-YOUR-TOKEN",
-      "app_token": "xapp-YOUR-TOKEN"
-    }
-  }
-}
-```
-
-Other supported channels: WhatsApp, DingTalk, Feishu, LINE, WeCom, QQ, OneBot.
-
----
-
 ## 🐳 Docker
 
-### Prerequisites
-- Docker and Docker Compose installed
-- Your API key configured in the config file
-
-### Option 1 — Gateway bot (long-running, recommended for Telegram/Discord)
-
 ```bash
-# Build and start the gateway
+# Build and start gateway bot
 make docker-gateway
 
-# Or manually:
-docker compose --profile gateway up -d
+# Or run a one-shot query
+make docker-agent ARGS='-m "what tasks do I have today?"'
+
+# View logs
+make docker-gateway-logs
+
+# Stop
+make docker-gateway-stop
 ```
 
-First run creates a minimal config at the named volume. Edit it:
+First run creates a minimal config. Edit it:
 ```bash
 docker exec octa-gateway cat /root/.octa/config.json > /tmp/config.json
 # Edit /tmp/config.json with your API key
@@ -315,185 +179,90 @@ docker cp /tmp/config.json octa-gateway:/root/.octa/config.json
 docker restart octa-gateway
 ```
 
-Logs:
-```bash
-make docker-gateway-logs
-# Or: docker compose logs -f octa-gateway
-```
-
-Stop:
-```bash
-make docker-gateway-stop
-# Or: docker compose --profile gateway down
-```
-
-### Option 2 — One-shot agent query
-
-```bash
-make docker-agent ARGS='-m "what tasks do I have today?"'
-# Or: docker compose --profile agent run --rm octa-agent -m "what tasks do I have today?"
-```
-
-### Option 3 — Build and run manually
-
-```bash
-# Build the image (from project root)
-docker build -t octa -f docker/Dockerfile .
-
-# Run gateway
-docker run -d \
-  --name octa-gateway \
-  --restart unless-stopped \
-  -v ~/.octa/config.json:/root/.octa/config.json:ro \
-  -v octa-workspace:/root/.octa/workspace \
-  octa gateway
-
-# Run one-shot query
-docker run --rm \
-  -v ~/.octa/config.json:/root/.octa/config.json:ro \
-  octa agent -m "hello!"
-```
-
-### Docker config tips
-
-- The container runs as root, so config lives at `/root/.octa/`
-- Mount your `config.json` as read-only (`:ro`)
-- Use a named volume for the workspace so sessions and memory persist across restarts
-- For Google OAuth: mount your tokens directory:
-  ```bash
-  -v ~/.octa/tokens:/root/.octa/tokens:ro
-  ```
+Image includes mpv, yt-dlp, and ffmpeg for music playback out of the box.
 
 ---
 
-## 📁 Directory Structure
+## 📖 Reference
+
+### Built-in Tools
+
+| Tool | What it does |
+|------|-------------|
+| `google_calendar` | Create, list, update, delete events + Google Meet |
+| `gmail` | Send, schedule, search, read emails |
+| `todoist` | Full task management (create, complete, bulk, delete) |
+| `rss` | Subscribe to feeds, auto-fetch every 30 min |
+| `web_search` | Search the web (Brave, Tavily, DuckDuckGo, Perplexity) |
+| `web_fetch` | Read any URL's content |
+| `shell` | Run terminal commands (with safety guards) |
+| `youtube_music` | Play YouTube audio, queue, volume, pause/resume |
+| `message` | Send a message to the user mid-tool-chain |
+| `spawn` | Spawn a subagent for async subtasks |
+| `cron` | Schedule recurring tasks |
+
+### Messaging Channels
+
+Telegram, Discord, Slack, WhatsApp, DingTalk, Feishu, LINE, WeCom, QQ, OneBot.
+
+### LLM Providers
+
+| Provider | Config |
+|----------|--------|
+| **Google Gemini** | Free tier. [Get key](https://aistudio.google.com/app/apikey) |
+| **Anthropic Claude** | `api_key: "sk-ant-..."` |
+| **OpenRouter** | One key for Claude, GPT-4, Gemini. [Get key](https://openrouter.ai) |
+| **Ollama** | Local models, no API key needed |
+
+### CLI Commands
+
+```bash
+octa agent              # Interactive terminal session
+octa agent -m "msg"     # One-shot query
+octa gateway            # Start gateway (bots + background jobs)
+octa auth google        # Google OAuth flow
+octa status             # Health check
+octa cron               # Manage scheduled tasks
+octa skills             # Install/list/remove skills
+octa version            # Show version
+```
+
+### Configuration
+
+Full example: [`config/config.example.json`](config/config.example.json)
+
+### Directory Structure
 
 ```
 ~/.octa/
 ├── config.json          # Your configuration
-├── tokens/
-│   └── google.json      # Google OAuth token
+├── tokens/              # OAuth tokens
 ├── data/
 │   └── scheduler.db     # SQLite: email queue + RSS cache
 └── workspace/
-    ├── AGENT.md         # Agent instructions + tool rules
+    ├── AGENT.md         # Agent instructions
     ├── IDENTITY.md      # Agent identity
     ├── SOUL.md          # Agent personality
-    ├── USER.md          # Your profile and preferences
-    ├── TOOLS.md         # Tool calling rules
+    ├── USER.md          # Your profile
     ├── memory/          # Long-term memory
     └── sessions/        # Conversation history
 ```
 
 ---
 
-## ⚙️ Configuration Reference
-
-Full example: [`config/config.example.json`](config/config.example.json)
-
-### Minimal config
-
-```json
-{
-  "agents": {
-    "defaults": {
-      "model": "gemini-2.0-flash",
-      "max_tokens": 8192,
-      "max_tool_iterations": 20
-    }
-  },
-  "model_list": [
-    {
-      "model_name": "gemini-2.0-flash",
-      "api_base": "https://generativelanguage.googleapis.com/v1beta/openai/",
-      "api_key": "YOUR_API_KEY",
-      "model": "gemini-2.0-flash"
-    }
-  ]
-}
-```
-
-### With Telegram bot + Google tools + Todoist
-
-```json
-{
-  "agents": {
-    "defaults": {
-      "model": "gemini-2.0-flash",
-      "max_tokens": 8192,
-      "max_tool_iterations": 20
-    }
-  },
-  "model_list": [
-    {
-      "model_name": "gemini-2.0-flash",
-      "api_base": "https://generativelanguage.googleapis.com/v1beta/openai/",
-      "api_key": "YOUR_GEMINI_KEY",
-      "model": "gemini-2.0-flash"
-    }
-  ],
-  "channels": {
-    "telegram": {
-      "enabled": true,
-      "token": "YOUR_TELEGRAM_BOT_TOKEN",
-      "allowed_users": ["your_telegram_username"]
-    }
-  },
-  "integrations": {
-    "google": {
-      "client_id": "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com",
-      "client_secret": "YOUR_GOOGLE_CLIENT_SECRET",
-      "redirect_uri": "http://127.0.0.1:8080/oauth/callback",
-      "token_file": "~/.octa/tokens/google.json",
-      "scopes": [
-        "https://www.googleapis.com/auth/calendar",
-        "https://www.googleapis.com/auth/gmail.modify"
-      ]
-    },
-    "todoist": {
-      "api_token": "YOUR_TODOIST_API_TOKEN"
-    }
-  }
-}
-```
-
----
-
-## 🖥️ CLI Commands
-
-```bash
-octa agent              # Start interactive terminal session
-octa agent -m "msg"     # One-shot message
-octa agent --model X    # Use a specific model for this session
-octa gateway            # Start gateway (Telegram/Discord/Slack bot + background jobs)
-octa auth google        # Run Google OAuth flow
-octa status             # Show status
-octa cron               # Manage scheduled tasks
-octa skills             # Manage skills (install, list, remove)
-octa migrate            # Migrate from OpenClaw config format
-octa version            # Show version
-```
-
----
-
 ## 🧩 Skills
 
-Skills are markdown files that extend Octa's capabilities with custom instructions and scripts.
+Extend Octa with community skills:
 
 ```bash
-# Install a skill from the community hub
 octa skills install weather
-
-# List installed skills
 octa skills list
-
-# Remove a skill
 octa skills remove weather
 ```
 
 ---
 
-## 🏗️ Architecture
+## 🏗️ Architecture (for developers)
 
 ```
 ┌─────────────────────────────────────────────┐
@@ -515,15 +284,10 @@ octa skills remove weather
         ┌──────────┼──────────┐
         ▼          ▼          ▼
    Calendar      Gmail     Todoist    RSS ...
-                   
+
 ┌──────────────────────────────────────────────┐
 │         Shared Scheduler (pkg/scheduler)      │
 │  email_dispatch │ meeting_reminder │ rss_fetch│
-└──────────────────────────────────────────────┘
-
-┌──────────────────────────────────────────────┐
-│         Shared SQLite Pool (pkg/db)           │
-│      email queue + RSS cache (sync.Once)      │
 └──────────────────────────────────────────────┘
 ```
 
@@ -531,24 +295,17 @@ octa skills remove weather
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please read the contributing guidelines before submitting a PR.
-
 ```bash
-# Run tests
-make test
-
-# Run linter
-make lint
-
-# Format code
-make fmt
+make test    # Run tests
+make lint    # Run linter
+make fmt     # Format code
 ```
 
 ---
 
 ## 📄 License
 
-MIT License — see [LICENSE](LICENSE) for details.
+MIT — see [LICENSE](LICENSE).
 
 ---
 

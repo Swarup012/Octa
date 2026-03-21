@@ -1,9 +1,9 @@
-# PicoClaw Launcher
+# Octa Launcher
 
 > [!WARNING]
 > 该项目属于临时解决方案，后续会重构并提供完整的 Web 服务，因此该目录下的接口并不稳定。
 
-PicoClaw 的独立启动器，提供可视化 JSON 配置编辑和 OAuth Provider 认证管理。
+Octa 的独立启动器，提供可视化 JSON 配置编辑和 OAuth Provider 认证管理。
 
 ## 功能
 
@@ -19,16 +19,16 @@ PicoClaw 的独立启动器，提供可视化 JSON 配置编辑和 OAuth Provide
 
 ```bash
 # 编译
-go build -o picoclaw-launcher ./cmd/picoclaw-launcher/
+go build -o octa-launcher ./cmd/octa-launcher/
 
-# 运行（使用默认配置路径 ~/.picoclaw/config.json）
-./picoclaw-launcher
+# 运行（使用默认配置路径 ~/.octa/config.json）
+./octa-launcher
 
 # 指定配置文件
-./picoclaw-launcher ./config.json
+./octa-launcher ./config.json
 
 # 允许局域网访问
-./picoclaw-launcher -public
+./octa-launcher -public
 ```
 
 启动后在浏览器中打开 `http://localhost:18800`。
@@ -36,10 +36,10 @@ go build -o picoclaw-launcher ./cmd/picoclaw-launcher/
 ## 命令行参数
 
 ```
-Usage: picoclaw-launcher [options] [config.json]
+Usage: octa-launcher [options] [config.json]
 
 Arguments:
-  config.json    配置文件路径（默认: ~/.picoclaw/config.json）
+  config.json    配置文件路径（默认: ~/.octa/config.json）
 
 Options:
   -public        监听所有网络接口（0.0.0.0），允许局域网设备访问
@@ -68,7 +68,7 @@ Base URL: `http://localhost:18800`
 ```json
 {
   "config": { ... },
-  "path": "/Users/xiao/.picoclaw/config.json"
+  "path": "/Users/xiao/.octa/config.json"
 }
 ```
 
@@ -190,7 +190,7 @@ Base URL: `http://localhost:18800`
 }
 ```
 
-认证完成后 Google 回调至 `GET /auth/callback`，自动保存凭据并重定向回 picoclaw-config 页面。
+认证完成后 Google 回调至 `GET /auth/callback`，自动保存凭据并重定向回 octa-config 页面。
 
 ---
 
@@ -228,7 +228,7 @@ OAuth Browser 回调端点（Google Antigravity 专用），由 OAuth Provider �
 
 #### GET /api/process/status
 
-获取 `picoclaw gateway` 进程的运行状态。
+获取 `octa gateway` 进程的运行状态。
 
 **Response** `200 OK` (运行中)
 
@@ -253,7 +253,7 @@ OAuth Browser 回调端点（Google Antigravity 专用），由 OAuth Provider �
 
 #### POST /api/process/start
 
-在后台启动 `picoclaw gateway` 进程。
+在后台启动 `octa gateway` 进程。
 
 **Response** `200 OK`
 
@@ -268,7 +268,7 @@ OAuth Browser 回调端点（Google Antigravity 专用），由 OAuth Provider �
 
 #### POST /api/process/stop
 
-停止正在运行的 `picoclaw gateway` 进程。
+停止正在运行的 `octa gateway` 进程。
 
 **Response** `200 OK`
 
@@ -283,5 +283,5 @@ OAuth Browser 回调端点（Google Antigravity 专用），由 OAuth Provider �
 ## 测试
 
 ```bash
-go test -v ./cmd/picoclaw-launcher/
+go test -v ./cmd/octa-launcher/
 ```

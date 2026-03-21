@@ -1,8 +1,8 @@
-# PicoClaw Channel System Refactor: Complete Development Guide
+# Octa Channel System Refactor: Complete Development Guide
 
 > **Branch**: `refactor/channel-system`
 > **Status**: Active development (~40 commits)
-> **Scope**: `pkg/channels/`, `pkg/bus/`, `pkg/media/`, `pkg/identity/`, `cmd/picoclaw/internal/gateway/`
+> **Scope**: `pkg/channels/`, `pkg/bus/`, `pkg/media/`, `pkg/identity/`, `cmd/octa/internal/gateway/`
 
 ---
 
@@ -161,19 +161,19 @@ Using Telegram as an example, the main changes are:
 package channels
 
 import (
-    "github.com/sipeed/picoclaw/pkg/bus"
-    "github.com/sipeed/picoclaw/pkg/config"
+    "github.com/sipeed/octa/pkg/bus"
+    "github.com/sipeed/octa/pkg/config"
 )
 
 // New code (refactored branch)
 package telegram
 
 import (
-    "github.com/sipeed/picoclaw/pkg/bus"
-    "github.com/sipeed/picoclaw/pkg/channels"     // Reference parent package
-    "github.com/sipeed/picoclaw/pkg/config"
-    "github.com/sipeed/picoclaw/pkg/identity"      // New
-    "github.com/sipeed/picoclaw/pkg/media"          // New (if media support needed)
+    "github.com/sipeed/octa/pkg/bus"
+    "github.com/sipeed/octa/pkg/channels"     // Reference parent package
+    "github.com/sipeed/octa/pkg/config"
+    "github.com/sipeed/octa/pkg/identity"      // New
+    "github.com/sipeed/octa/pkg/media"          // New (if media support needed)
 )
 ```
 
@@ -319,9 +319,9 @@ Create `init.go` for your channel:
 package telegram
 
 import (
-    "github.com/sipeed/picoclaw/pkg/bus"
-    "github.com/sipeed/picoclaw/pkg/channels"
-    "github.com/sipeed/picoclaw/pkg/config"
+    "github.com/sipeed/octa/pkg/bus"
+    "github.com/sipeed/octa/pkg/channels"
+    "github.com/sipeed/octa/pkg/config"
 )
 
 func init() {
@@ -334,11 +334,11 @@ func init() {
 **3h. Import sub-package in Gateway**
 
 ```go
-// cmd/picoclaw/internal/gateway/helpers.go
+// cmd/octa/internal/gateway/helpers.go
 import (
-    _ "github.com/sipeed/picoclaw/pkg/channels/telegram"   // Triggers init() registration
-    _ "github.com/sipeed/picoclaw/pkg/channels/discord"
-    _ "github.com/sipeed/picoclaw/pkg/channels/your_new_channel"  // New addition
+    _ "github.com/sipeed/octa/pkg/channels/telegram"   // Triggers init() registration
+    _ "github.com/sipeed/octa/pkg/channels/discord"
+    _ "github.com/sipeed/octa/pkg/channels/your_new_channel"  // New addition
 )
 ```
 
@@ -419,9 +419,9 @@ To add a new chat platform (e.g., `matrix`), you need to:
 package matrix
 
 import (
-    "github.com/sipeed/picoclaw/pkg/bus"
-    "github.com/sipeed/picoclaw/pkg/channels"
-    "github.com/sipeed/picoclaw/pkg/config"
+    "github.com/sipeed/octa/pkg/bus"
+    "github.com/sipeed/octa/pkg/channels"
+    "github.com/sipeed/octa/pkg/config"
 )
 
 func init() {
@@ -440,11 +440,11 @@ import (
     "context"
     "fmt"
 
-    "github.com/sipeed/picoclaw/pkg/bus"
-    "github.com/sipeed/picoclaw/pkg/channels"
-    "github.com/sipeed/picoclaw/pkg/config"
-    "github.com/sipeed/picoclaw/pkg/identity"
-    "github.com/sipeed/picoclaw/pkg/logger"
+    "github.com/sipeed/octa/pkg/bus"
+    "github.com/sipeed/octa/pkg/channels"
+    "github.com/sipeed/octa/pkg/config"
+    "github.com/sipeed/octa/pkg/identity"
+    "github.com/sipeed/octa/pkg/logger"
 )
 
 // MatrixChannel implements channels.Channel for the Matrix protocol.
@@ -770,9 +770,9 @@ if m.config.Channels.Matrix.Enabled && m.config.Channels.Matrix.Token != "" {
 #### Add blank import in Gateway
 
 ```go
-// cmd/picoclaw/internal/gateway/helpers.go
+// cmd/octa/internal/gateway/helpers.go
 import (
-    _ "github.com/sipeed/picoclaw/pkg/channels/matrix"
+    _ "github.com/sipeed/octa/pkg/channels/matrix"
 )
 ```
 
@@ -1328,4 +1328,4 @@ agentLoop.Stop()               // Stop Agent
 
 3. **WeCom has two factories**: `"wecom"` (Bot mode) and `"wecom_app"` (App mode) are registered separately.
 
-4. **Pico Protocol**: `pkg/channels/pico/` implements a custom PicoClaw native protocol channel that receives messages via webhook.
+4. **Pico Protocol**: `pkg/channels/pico/` implements a custom Octa native protocol channel that receives messages via webhook.

@@ -10,7 +10,7 @@ import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 
-	picoclawconfig "github.com/Swarup012/solo/pkg/config"
+	octaconfig "github.com/Swarup012/solo/pkg/config"
 )
 
 func (s *appState) modelMenu() tview.Primitive {
@@ -22,7 +22,7 @@ func (s *appState) modelMenu() tview.Primitive {
 			Description: "Append a new model entry",
 			Action: func() {
 				s.addModel(
-					picoclawconfig.ModelConfig{ModelName: "new-model", Model: "openai/gpt-5.2"},
+					octaconfig.ModelConfig{ModelName: "new-model", Model: "openai/gpt-5.2"},
 				)
 				s.push(
 					fmt.Sprintf("model-%d", len(s.config.ModelList)-1),
@@ -192,7 +192,7 @@ func addIntInput(form *tview.Form, label string, value int, onChange func(int)) 
 	})
 }
 
-func (s *appState) addModel(model picoclawconfig.ModelConfig) {
+func (s *appState) addModel(model octaconfig.ModelConfig) {
 	s.config.ModelList = append(s.config.ModelList, model)
 }
 
@@ -213,7 +213,7 @@ func modelStatusColor(valid bool, selected bool) *tcell.Color {
 	return &color
 }
 
-func refreshModelMenu(menu *Menu, currentModel string, models []picoclawconfig.ModelConfig) {
+func refreshModelMenu(menu *Menu, currentModel string, models []octaconfig.ModelConfig) {
 	for i, model := range models {
 		row := i + 1
 		label := fmt.Sprintf("%s (%s)", model.ModelName, model.Model)
@@ -242,7 +242,7 @@ func refreshModelMenuFromState(menu *Menu, s *appState) {
 			Description: "Append a new model entry",
 			Action: func() {
 				s.addModel(
-					picoclawconfig.ModelConfig{ModelName: "new-model", Model: "openai/gpt-5.2"},
+					octaconfig.ModelConfig{ModelName: "new-model", Model: "openai/gpt-5.2"},
 				)
 				s.push(
 					fmt.Sprintf("model-%d", len(s.config.ModelList)-1),
@@ -280,14 +280,14 @@ func refreshModelMenuFromState(menu *Menu, s *appState) {
 	menu.applyItems(items)
 }
 
-func isModelValid(model picoclawconfig.ModelConfig) bool {
+func isModelValid(model octaconfig.ModelConfig) bool {
 	hasKey := strings.TrimSpace(model.APIKey) != "" ||
 		strings.TrimSpace(model.AuthMethod) == "oauth"
 	hasModel := strings.TrimSpace(model.Model) != ""
 	return hasKey && hasModel
 }
 
-func (s *appState) testModel(model *picoclawconfig.ModelConfig) {
+func (s *appState) testModel(model *octaconfig.ModelConfig) {
 	if model == nil {
 		return
 	}
