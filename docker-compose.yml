@@ -1,18 +1,26 @@
+# Octa Docker Compose
+#
+# Usage (from project root):
+#   Gateway bot:   docker compose --profile gateway up -d
+#   Agent query:   docker compose --profile agent run --rm octa-agent -m "hello"
+#   Logs:          docker compose logs -f octa-gateway
+#   Stop:          docker compose --profile gateway down
+
 services:
   # ─────────────────────────────────────────────
   # Octa Agent (one-shot query)
-  #   docker compose -f docker/docker-compose.yml run --rm octa-agent -m "Hello"
+  #   docker compose --profile agent run --rm octa-agent -m "Hello"
   # ─────────────────────────────────────────────
   octa-agent:
     build:
-      context: ..
+      context: .
       dockerfile: docker/Dockerfile
     image: octa:latest
     container_name: octa-agent
     profiles:
       - agent
     volumes:
-      - ./data:/root/.octa
+      - octa-data:/root/.octa
     environment:
       - HOME=/root
     entrypoint: ["octa", "agent"]
@@ -21,18 +29,23 @@ services:
 
   # ─────────────────────────────────────────────
   # Octa Gateway (Long-running Bot)
-  #   docker compose -f docker/docker-compose.yml --profile gateway up -d
+  #   docker compose --profile gateway up -d
   # ─────────────────────────────────────────────
   octa-gateway:
     build:
-      context: ..
+      context: .
       dockerfile: docker/Dockerfile
     image: octa:latest
     container_name: octa-gateway
-    restart: on-failure
+    restart: unless-stopped
     profiles:
       - gateway
+    ports:
+      - "18790:18790"
     volumes:
-      - ./data:/root/.octa
+      - octa-data:/root/.octa
     environment:
       - HOME=/root
+
+volumes:
+  octa-data:

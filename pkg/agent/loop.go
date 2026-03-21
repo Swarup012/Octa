@@ -126,6 +126,10 @@ func registerSharedTools(
 			agent.Tools.Register(fetchTool)
 		}
 
+		// YouTube music tool
+		musicTool := tools.NewYouTubeMusicTool()
+		agent.Tools.Register(musicTool)
+
 		// Hardware tools (I2C, SPI) - Linux only, returns error on other platforms
 		agent.Tools.Register(tools.NewI2CTool())
 		agent.Tools.Register(tools.NewSPITool())
@@ -243,6 +247,17 @@ func (al *AgentLoop) Run(ctx context.Context) error {
 
 func (al *AgentLoop) Stop() {
 	al.running.Store(false)
+
+	// Clean up music tool (stop mpv, remove IPC sockets)
+	for _, agentID := range al.registry.ListAgentIDs() {
+		if agent, ok := al.registry.GetAgent(agentID); ok {
+			if tool, ok := agent.Tools.Get("youtube_music"); ok {
+				if mt, ok := tool.(*tools.YouTubeMusicTool); ok {
+					mt.Cleanup()
+				}
+			}
+		}
+	}
 }
 
 func (al *AgentLoop) RegisterTool(tool tools.Tool) {
@@ -1391,6 +1406,24 @@ func (al *AgentLoop) handleCommand(ctx context.Context, msg bus.InboundMessage) 
 		default:
 			return "Usage: /approve [5m|once|revoke]", true
 		}
+
+	case "/play":
+		// Play a song: /play <song name>
+		// This just forwards the request to the agent - the agent will use the youtube_music tool
+		if len(args) == 0 {
+			return "Usage: /play <song name>\nExamples:\n  /play bohemian rhapsody\n  /play money song by pink floyd", true
+		}
+		// Let LLM handle this - don't process, allow tool use
+		return "", false
+
+	case "/music":
+		// Music control: /music <action>
+		// Actions: pause, resume, stop, status, volume <level>, play <song>
+		if len(args) == 0 {
+			return "Usage: /music <action>\nActions:\n  /music pause\n  /music resume\n  /music stop\n  /music status\n  /music volume 70\n  /music play <song name>", true
+		}
+		// Let LLM handle this - don't process, allow tool use
+		return "", false
 	}
 
 	return "", false

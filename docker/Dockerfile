@@ -20,7 +20,19 @@ RUN make build
 # ============================================================
 FROM alpine:3.23
 
-RUN apk add --no-cache ca-certificates tzdata curl
+# System deps: networking, timezone, music playback
+# Keep python3 + py3-pip for yt-dlp
+RUN apk add --no-cache \
+    ca-certificates \
+    tzdata \
+    curl \
+    ffmpeg \
+    mpv \
+    python3 \
+    py3-pip
+
+# yt-dlp via pip (Alpine package is often outdated)
+RUN pip3 install --break-system-packages --no-cache-dir yt-dlp
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \

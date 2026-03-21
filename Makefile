@@ -204,6 +204,26 @@ check: deps fmt vet test
 run: build
 	@$(BUILD_DIR)/$(BINARY_NAME) $(ARGS)
 
+## docker-build: Build the Docker image
+docker-build:
+	docker build -t octa:latest -f docker/Dockerfile .
+
+## docker-gateway: Start the gateway bot in Docker
+docker-gateway: docker-build
+	docker compose --profile gateway up -d
+
+## docker-gateway-logs: Show gateway logs
+docker-gateway-logs:
+	docker compose logs -f octa-gateway
+
+## docker-gateway-stop: Stop the gateway bot
+docker-gateway-stop:
+	docker compose --profile gateway down
+
+## docker-agent: Run a one-shot query in Docker
+docker-agent: docker-build
+	docker compose --profile agent run --rm octa-agent $(ARGS)
+
 ## help: Show this help message
 help:
 	@echo "picoclaw Makefile"
