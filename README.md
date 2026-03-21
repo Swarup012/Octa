@@ -29,6 +29,7 @@ Inspired by [OpenClaw](https://github.com/OpenClaw-project) and [PicoClaw](https
 
 - 🧠 **Multi-provider LLM** — Claude, Gemini, GPT-4, OpenRouter, Llama, and more
 - ⚡ **Parallel tool execution** — multiple tools run simultaneously in one response
+- 🎵 **Music playback** — play YouTube audio via mpv + yt-dlp with queue, volume, pause/resume
 - 📅 **Google Calendar** — create, list, update, delete events + Google Meet
 - 📧 **Gmail** — send, schedule, search, read emails
 - ✅ **Todoist** — full task management (create, complete, bulk operations)
@@ -173,6 +174,7 @@ Get your key: https://openrouter.ai
 | `web_search` | Search the web using configured search API. |
 | `web_fetch` | Fetch and read the content of any URL. |
 | `shell` | Run shell commands on your machine. |
+| `youtube_music` | Play music from YouTube via mpv + yt-dlp. Supports play, pause, resume, stop, volume, queue. |
 | `message` | Send a message to the user from within a tool chain. |
 | `spawn` | Spawn a subagent to handle a subtask asynchronously. |
 | `cron` | Schedule recurring tasks. |
@@ -292,60 +294,75 @@ Other supported channels: WhatsApp, DingTalk, Feishu, LINE, WeCom, QQ, OneBot.
 
 ## 🐳 Docker
 
+### Prerequisites
+- Docker and Docker Compose installed
+- Your API key configured in the config file
+
 ### Option 1 — Gateway bot (long-running, recommended for Telegram/Discord)
 
 ```bash
-# 1. Copy your config
-mkdir -p config
-cp ~/.octa/config.json config/config.json
+# Build and start the gateway
+make docker-gateway
 
-# 2. Start the gateway
+# Or manually:
 docker compose --profile gateway up -d
+```
+
+First run creates a minimal config at the named volume. Edit it:
+```bash
+docker exec octa-gateway cat /root/.octa/config.json > /tmp/config.json
+# Edit /tmp/config.json with your API key
+docker cp /tmp/config.json octa-gateway:/root/.octa/config.json
+docker restart octa-gateway
 ```
 
 Logs:
 ```bash
-docker compose logs -f octa-gateway
+make docker-gateway-logs
+# Or: docker compose logs -f octa-gateway
 ```
 
 Stop:
 ```bash
-docker compose --profile gateway down
+make docker-gateway-stop
+# Or: docker compose --profile gateway down
 ```
 
 ### Option 2 — One-shot agent query
 
 ```bash
-docker compose --profile agent run --rm octa-agent -m "what tasks do I have today?"
+make docker-agent ARGS='-m "what tasks do I have today?"'
+# Or: docker compose --profile agent run --rm octa-agent -m "what tasks do I have today?"
 ```
 
 ### Option 3 — Build and run manually
 
 ```bash
-# Build the image
-docker build -t octa .
+# Build the image (from project root)
+docker build -t octa -f docker/Dockerfile .
 
 # Run gateway
 docker run -d \
   --name octa-gateway \
   --restart unless-stopped \
-  -v ~/.octa/config.json:/home/octa/.octa/config.json:ro \
-  -v octa-workspace:/home/octa/.octa/workspace \
+  -v ~/.octa/config.json:/root/.octa/config.json:ro \
+  -v octa-workspace:/root/.octa/workspace \
   octa gateway
 
 # Run one-shot query
 docker run --rm \
-  -v ~/.octa/config.json:/home/octa/.octa/config.json:ro \
+  -v ~/.octa/config.json:/root/.octa/config.json:ro \
   octa agent -m "hello!"
 ```
 
 ### Docker config tips
 
+- The container runs as root, so config lives at `/root/.octa/`
 - Mount your `config.json` as read-only (`:ro`)
 - Use a named volume for the workspace so sessions and memory persist across restarts
 - For Google OAuth: mount your tokens directory:
   ```bash
-  -v ~/.octa/tokens:/home/octa/.octa/tokens:ro
+  -v ~/.octa/tokens:/root/.octa/tokens:ro
   ```
 
 ---
