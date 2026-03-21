@@ -1,4 +1,3 @@
-This project is hevily modified from: https://github.com/sipeed/picoclaw
 <div align="center">
 
 # 🐙 Octa
