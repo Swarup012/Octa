@@ -20,7 +20,11 @@ Octa is a **personal AI agent** that runs on your own machine. You pick an LLM (
 
 You talk to Octa through **Telegram, Discord, Slack, WhatsApp**, or just your terminal. It remembers your conversations, runs background jobs on a schedule, and executes multiple tools in parallel so responses feel instant.
 
+Inspired by [OpenClaw](https://github.com/OpenClaw-project) — rewritten in Go to be **50x lighter**. No Node.js, no bloat. Runs on a Raspberry Pi.
+
 No cloud subscription. No data leaving your machine. Your keys, your rules.
+
+![Octa Model](assets/images/octa_model.png)
 
 ---
 
@@ -40,6 +44,21 @@ You end up copy-pasting between 10 tabs. Your AI assistant is just a chatbot wit
 | AI only works in one tab | Works on Telegram, Discord, Slack, WhatsApp, or terminal |
 | AI costs money every month | Runs on your machine with your own API keys (Gemini free tier works) |
 | AI can't do background work | Built-in scheduler for reminders, email dispatch, RSS polling |
+
+### Octa vs OpenClaw
+
+Octa is inspired by [OpenClaw](https://github.com/OpenClaw-project), but rebuilt from the ground up in Go for one reason: **it should run on anything**.
+
+| | OpenClaw | Octa |
+|--|----------|------|
+| **Language** | Node.js | Go |
+| **Memory usage** | ~1 GB | ~20 MB |
+| **Runs on** | Needs a beefy machine (Mac Mini recommended) | A $5 VPS, a Raspberry Pi, your old laptop |
+| **Binary size** | Requires Node.js runtime | Single static binary, no runtime |
+| **Startup time** | Seconds (Node.js boot) | Instant |
+| **Docker image** | 1+ GB | ~540 MB (with mpv/ffmpeg included) |
+
+You don't need to buy a Mac Mini. Octa runs comfortably on a 1 GB RAM droplet. It's a Go binary — no Node.js, no npm, no dependency hell.
 
 ---
 
