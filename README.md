@@ -24,7 +24,7 @@ Inspired by [OpenClaw](https://github.com/OpenClaw-project) — rewritten in Go 
 
 No cloud subscription. No data leaving your machine. Your keys, your rules.
 
-![Octa Model](assets/images/octa_model.png)
+![Octa Model](assets/images/model.png)
 
 ---
 

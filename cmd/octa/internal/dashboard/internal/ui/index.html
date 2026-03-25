@@ -749,6 +749,221 @@
         }
 
         /* ── MODEL GRID ── */
+        .model-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .model-search {
+            flex: 1;
+            min-width: 200px;
+            font-family: var(--font);
+            font-size: 13px;
+            padding: 7px 12px 7px 32px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border1);
+            background: var(--bg2);
+            color: var(--text0);
+            outline: none;
+            transition: border-color var(--t) var(--ease);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: 10px center;
+        }
+
+        .model-search:focus {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.07);
+        }
+
+        .model-search::placeholder {
+            color: var(--text4);
+        }
+
+        .quick-add-wrap {
+            position: relative;
+        }
+
+        .quick-add-btn {
+            font-family: var(--font);
+            font-size: 12px;
+            font-weight: 500;
+            padding: 0 12px;
+            height: 32px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border1);
+            background: var(--bg2);
+            color: var(--text2);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all var(--t) var(--ease);
+            white-space: nowrap;
+        }
+
+        .quick-add-btn:hover {
+            background: var(--bg3);
+            border-color: var(--border2);
+            color: var(--text0);
+        }
+
+        .quick-add-btn .arrow {
+            font-size: 9px;
+            transition: transform var(--t);
+        }
+
+        .quick-add-btn.open .arrow {
+            transform: rotate(180deg);
+        }
+
+        .quick-add-dropdown {
+            position: absolute;
+            top: calc(100% + 4px);
+            right: 0;
+            background: var(--bg2);
+            border: 1px solid var(--border2);
+            border-radius: var(--radius-md);
+            padding: 6px 0;
+            min-width: 220px;
+            z-index: 50;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            display: none;
+        }
+
+        .quick-add-dropdown.open {
+            display: block;
+            animation: dropdownIn 150ms var(--ease);
+        }
+
+        @keyframes dropdownIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .quick-add-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 14px;
+            cursor: pointer;
+            transition: background var(--t);
+            font-size: 13px;
+            color: var(--text1);
+        }
+
+        .quick-add-item:hover {
+            background: var(--bg3);
+            color: var(--text0);
+        }
+
+        .quick-add-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+
+        .quick-add-label {
+            flex: 1;
+        }
+
+        .quick-add-models {
+            font-size: 10px;
+            color: var(--text4);
+        }
+
+        .model-summary {
+            font-size: 12px;
+            color: var(--text3);
+            margin-bottom: 16px;
+            padding: 8px 12px;
+            background: var(--bg2);
+            border: 1px solid var(--border0);
+            border-radius: var(--radius-md);
+            display: flex;
+            gap: 16px;
+        }
+
+        .model-summary-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .model-summary-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        /* Empty state */
+        .model-empty {
+            text-align: center;
+            padding: 48px 20px;
+            color: var(--text3);
+        }
+
+        .model-empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .model-empty-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text1);
+            margin-bottom: 8px;
+        }
+
+        .model-empty-desc {
+            font-size: 13px;
+            color: var(--text3);
+            margin-bottom: 24px;
+            max-width: 360px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.6;
+        }
+
+        .model-presets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .model-preset-btn {
+            font-family: var(--font);
+            font-size: 12px;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border2);
+            background: var(--bg2);
+            color: var(--text1);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all var(--t) var(--ease);
+        }
+
+        .model-preset-btn:hover {
+            background: var(--bg3);
+            border-color: var(--neon-violet);
+            color: var(--text0);
+            box-shadow: 0 0 0 1px rgba(192, 132, 252, 0.1);
+        }
+
         .model-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -1415,10 +1630,20 @@
                         <div class="panel-desc" data-i18n="models.desc">Manage LLM configurations. Models without an API
                             key are dimmed. Only available models can be set as primary.</div>
                     </div>
-                    <div style="margin-bottom:14px;">
+                    <div class="model-toolbar">
+                        <input type="text" class="model-search" id="modelSearch" placeholder="Search models..." oninput="renderModels()">
+                        <div class="quick-add-wrap">
+                            <button class="quick-add-btn" onclick="toggleQuickAdd(this)">
+                                <span>Quick Add</span>
+                                <span class="arrow">▾</span>
+                            </button>
+                            <div class="quick-add-dropdown" id="quickAddDropdown"></div>
+                        </div>
                         <button class="btn btn-primary" onclick="showAddModelModal()" data-i18n="models.add">+ Add
                             Model</button>
                     </div>
+                    <div class="model-summary" id="modelSummary" style="display:none;"></div>
+                    <div id="modelEmptyState" style="display:none;"></div>
                     <div class="model-grid" id="modelGrid"></div>
                 </div>
 
@@ -1575,7 +1800,7 @@
             en: {
                 'start': 'Start', 'stop': 'Stop', 'save': 'Save', 'cancel': 'Cancel', 'edit': 'Edit', 'delete': 'Delete', 'enabled': 'Enabled', 'comingSoon': 'Coming soon',
                 'sidebar.providers': 'Providers', 'sidebar.models': 'Models', 'sidebar.auth': 'Auth', 'sidebar.channels': 'Channels', 'sidebar.feishu': 'Feishu', 'sidebar.logs': 'Logs', 'sidebar.rawjson': 'Raw JSON',
-                'models.title': 'Models', 'models.desc': 'Manage LLM model configurations. Models without an API key are dimmed. Only available models can be set as primary.', 'models.add': '+ Add Model', 'models.noModels': 'No models configured.', 'models.primary': 'Primary', 'models.noKey': 'No Key', 'models.setPrimary': 'Set Primary', 'models.editModel': 'Edit Model', 'models.addModel': 'Add Model', 'models.advancedOptions': 'Advanced Options', 'models.deleteConfirm': 'Delete model "{name}"?', 'models.requiredFields': 'Model Name and Model ID are required',
+                'models.title': 'Models', 'models.desc': 'Manage LLM model configurations. Models without an API key are dimmed. Only available models can be set as primary.', 'models.add': '+ Add Model', 'models.noModels': 'No models configured.', 'models.primary': 'Primary', 'models.noKey': 'No Key', 'models.setPrimary': 'Set Primary', 'models.editModel': 'Edit Model', 'models.addModel': 'Add Model', 'models.advancedOptions': 'Advanced Options', 'models.deleteConfirm': 'Delete model "{name}"?', 'models.requiredFields': 'Model Name and Model ID are required', 'models.search': 'Search models...', 'models.quickAdd': 'Quick Add', 'models.noMatch': 'No models match "{term}"', 'models.emptyTitle': 'No models configured', 'models.emptyDesc': 'Add an LLM model to get started. Choose a provider below or add one manually.', 'models.addedModels': 'Added {count} model{plural} from {name}', 'models.alreadyExist': 'All {name} models already exist',
                 'field.modelName': 'Model Name', 'field.modelId': 'Model ID', 'field.modelIdHint': 'Format: protocol/model-id', 'field.apiKey': 'API Key', 'field.apiBase': 'API Base', 'field.proxy': 'Proxy', 'field.authMethod': 'Auth Method', 'field.connectMode': 'Connect Mode', 'field.workspace': 'Workspace', 'field.rpm': 'RPM Limit', 'field.requestTimeout': 'Request Timeout (s)',
                 'auth.title': 'Authentication', 'auth.desc': 'Login to providers using OAuth or API tokens. Credentials are stored locally in <code style="font-family:\'Geist Mono\',monospace;font-size:11px;background:var(--bg3);padding:2px 6px;border-radius:4px;">~/.octa/auth.json</code>.', 'auth.notLoggedIn': 'Not logged in', 'auth.active': 'Active', 'auth.expired': 'Expired', 'auth.needsRefresh': 'Needs Refresh', 'auth.authenticating': 'Authenticating...', 'auth.loginDevice': 'Login (Device Code)', 'auth.loginToken': 'Login (API Token)', 'auth.loginOAuth': 'Login (Browser OAuth)', 'auth.logout': 'Logout', 'auth.retry': 'Retry', 'auth.waiting': 'Waiting...', 'auth.pasteKey': 'Paste your API key…', 'auth.step1': 'Step 1: Click the link below', 'auth.step2': 'Step 2: Enter this code', 'auth.step3': 'Step 3: Complete auth in browser — this page updates automatically', 'auth.method': 'Method', 'auth.email': 'Email', 'auth.account': 'Account', 'auth.project': 'Project', 'auth.expires': 'Expires',
                 'ch.configure': 'Configure {name} channel settings.', 'ch.docLink': 'Documentation', 'ch.accessControl': 'Access Control', 'ch.allowFrom': 'Allow From (User IDs)', 'ch.addItem': '+ Add', 'ch.mentionOnly': 'Mention Only', 'ch.mentionOnlyHint': 'Only respond when mentioned', 'ch.groupTrigger': 'Group Trigger Prefixes',
@@ -1587,7 +1812,7 @@
             zh: {
                 'start': '启动', 'stop': '停止', 'save': '保存', 'cancel': '取消', 'edit': '编辑', 'delete': '删除', 'enabled': '启用', 'comingSoon': '即将推出',
                 'sidebar.providers': '提供商', 'sidebar.models': '模型', 'sidebar.auth': '认证', 'sidebar.channels': '通道', 'sidebar.feishu': '飞书', 'sidebar.logs': '日志', 'sidebar.rawjson': '原始 JSON',
-                'models.title': '模型', 'models.desc': '管理 LLM 模型配置。没有 API Key 的模型显示为灰色。只有可用模型才能设为主模型。', 'models.add': '+ 添加模型', 'models.noModels': '暂无模型配置。', 'models.primary': '主模型', 'models.noKey': '无 Key', 'models.setPrimary': '设为主模型', 'models.editModel': '编辑模型', 'models.addModel': '添加模型', 'models.advancedOptions': '高级选项', 'models.deleteConfirm': '确定删除模型"{name}"？', 'models.requiredFields': '模型名称和模型 ID 为必填项',
+                'models.title': '模型', 'models.desc': '管理 LLM 模型配置。没有 API Key 的模型显示为灰色。只有可用模型才能设为主模型。', 'models.add': '+ 添加模型', 'models.noModels': '暂无模型配置。', 'models.primary': '主模型', 'models.noKey': '无 Key', 'models.setPrimary': '设为主模型', 'models.editModel': '编辑模型', 'models.addModel': '添加模型', 'models.advancedOptions': '高级选项', 'models.deleteConfirm': '确定删除模型"{name}"？', 'models.requiredFields': '模型名称和模型 ID 为必填项', 'models.search': '搜索模型...', 'models.quickAdd': '快速添加', 'models.noMatch': '没有匹配 "{term}" 的模型', 'models.emptyTitle': '暂无模型配置', 'models.emptyDesc': '添加一个 LLM 模型以开始使用。从下方选择提供商或手动添加。', 'models.addedModels': '已从 {name} 添加 {count} 个模型', 'models.alreadyExist': '{name} 的所有模型已存在',
                 'field.modelName': '模型名称', 'field.modelId': '模型 ID', 'field.modelIdHint': '格式：协议/模型标识', 'field.apiKey': 'API Key', 'field.apiBase': 'API 地址', 'field.proxy': '代理', 'field.authMethod': '认证方式', 'field.connectMode': '连接模式', 'field.workspace': '工作区', 'field.rpm': 'RPM 限制', 'field.requestTimeout': '请求超时 (秒)',
                 'auth.title': '提供商认证', 'auth.desc': '通过 OAuth 或 API Token 登录提供商。凭证存储在本地 <code style="font-family:\'Geist Mono\',monospace;font-size:11px;background:var(--bg3);padding:2px 6px;border-radius:4px;">~/.octa/auth.json</code>。', 'auth.notLoggedIn': '未登录', 'auth.active': '已激活', 'auth.expired': '已过期', 'auth.needsRefresh': '需要刷新', 'auth.authenticating': '认证中...', 'auth.loginDevice': '登录 (设备码)', 'auth.loginToken': '登录 (API Token)', 'auth.loginOAuth': '登录 (浏览器 OAuth)', 'auth.logout': '登出', 'auth.retry': '重试', 'auth.waiting': '等待中...', 'auth.pasteKey': '请粘贴 API Key...', 'auth.step1': '第 1 步：点击下方链接', 'auth.step2': '第 2 步：输入以下代码', 'auth.step3': '第 3 步：在浏览器中完成认证，本页面会自动更新', 'auth.method': '方式', 'auth.email': '邮箱', 'auth.account': '账号', 'auth.project': '项目', 'auth.expires': '过期时间',
                 'ch.configure': '配置 {name} 通道设置。', 'ch.docLink': '配置指南', 'ch.accessControl': '访问控制', 'ch.allowFrom': '允许的用户 ID', 'ch.addItem': '+ 添加', 'ch.mentionOnly': '仅提及时响应', 'ch.mentionOnlyHint': '只在被 @提及时回复', 'ch.groupTrigger': '群聊触发前缀',
@@ -1727,16 +1952,190 @@
         });
 
         // ── Models ───────────────────────────────────────────────
+        const providerPresets = [
+            {
+                name: 'Google Gemini',
+                icon: 'G',
+                iconBg: 'var(--blue-dim)',
+                iconColor: 'var(--blue)',
+                models: [
+                    { model_name: 'gemini-2.0-flash', model: 'google/gemini-2.0-flash', api_base: 'https://generativelanguage.googleapis.com/v1beta/openai/' },
+                    { model_name: 'gemini-2.5-pro', model: 'google/gemini-2.5-pro', api_base: 'https://generativelanguage.googleapis.com/v1beta/openai/' },
+                ],
+            },
+            {
+                name: 'Anthropic Claude',
+                icon: 'A',
+                iconBg: 'var(--amber-dim)',
+                iconColor: 'var(--amber)',
+                models: [
+                    { model_name: 'claude-sonnet', model: 'anthropic/claude-sonnet-4-5' },
+                    { model_name: 'claude-haiku', model: 'anthropic/claude-haiku-3-5' },
+                ],
+            },
+            {
+                name: 'OpenAI',
+                icon: 'O',
+                iconBg: 'var(--green-dim)',
+                iconColor: 'var(--green)',
+                models: [
+                    { model_name: 'gpt-4o', model: 'openai/gpt-4o', api_base: 'https://api.openai.com/v1' },
+                    { model_name: 'gpt-4o-mini', model: 'openai/gpt-4o-mini', api_base: 'https://api.openai.com/v1' },
+                ],
+            },
+            {
+                name: 'OpenRouter',
+                icon: 'R',
+                iconBg: 'var(--purple-dim)',
+                iconColor: 'var(--purple)',
+                models: [
+                    { model_name: 'claude-via-or', model: 'openrouter/anthropic/claude-sonnet-4-5', api_base: 'https://openrouter.ai/api/v1' },
+                    { model_name: 'gpt4-via-or', model: 'openrouter/openai/gpt-4o', api_base: 'https://openrouter.ai/api/v1' },
+                ],
+            },
+            {
+                name: 'Ollama (Local)',
+                icon: 'L',
+                iconBg: 'var(--neon-cyan-dim)',
+                iconColor: 'var(--neon-cyan)',
+                models: [
+                    { model_name: 'llama3', model: 'ollama/llama3.1:8b', api_base: 'http://localhost:11434/v1', api_key: 'ollama' },
+                ],
+            },
+        ];
+
+        function toggleQuickAdd(btn) {
+            const dropdown = document.getElementById('quickAddDropdown');
+            const isOpen = dropdown.classList.contains('open');
+            document.querySelectorAll('.quick-add-dropdown').forEach(d => d.classList.remove('open'));
+            document.querySelectorAll('.quick-add-btn').forEach(b => b.classList.remove('open'));
+            if (!isOpen) {
+                dropdown.classList.add('open');
+                btn.classList.add('open');
+            }
+        }
+
+        document.addEventListener('click', function (e) {
+            if (!e.target.closest('.quick-add-wrap')) {
+                document.getElementById('quickAddDropdown').classList.remove('open');
+                document.querySelectorAll('.quick-add-btn').forEach(b => b.classList.remove('open'));
+            }
+        });
+
+        function renderQuickAddDropdown() {
+            const dropdown = document.getElementById('quickAddDropdown');
+            let html = '';
+            providerPresets.forEach((p, pi) => {
+                const modelNames = p.models.map(m => m.model_name).join(', ');
+                html += `<div class="quick-add-item" onclick="quickAddProvider(${pi})">`;
+                html += `<div class="quick-add-icon" style="background:${p.iconBg};color:${p.iconColor};font-weight:600;font-size:12px;">${p.icon}</div>`;
+                html += `<div><div class="quick-add-label">${p.name}</div><div class="quick-add-models">${p.models.length} models</div></div>`;
+                html += `</div>`;
+            });
+            dropdown.innerHTML = html;
+        }
+
+        function quickAddProvider(presetIdx) {
+            const preset = providerPresets[presetIdx];
+            if (!preset) return;
+            if (!configData.model_list) configData.model_list = [];
+            let added = 0;
+            preset.models.forEach(m => {
+                const exists = configData.model_list.some(existing => existing.model_name === m.model_name);
+                if (!exists) {
+                    configData.model_list.push({ ...m });
+                    added++;
+                }
+            });
+            document.getElementById('quickAddDropdown').classList.remove('open');
+            document.querySelectorAll('.quick-add-btn').forEach(b => b.classList.remove('open'));
+            if (added > 0) {
+                if (!configData.agents) configData.agents = {};
+                if (!configData.agents.defaults) configData.agents.defaults = {};
+                if (!configData.agents.defaults.model_name) {
+                    configData.agents.defaults.model_name = preset.models[0].model_name;
+                }
+                saveConfig().then(renderModels);
+                showStatus(`Added ${added} model${added > 1 ? 's' : ''} from ${preset.name}`, 'success');
+            } else {
+                showStatus(`All ${preset.name} models already exist`, 'success');
+            }
+        }
+
+        function quickAddModelFromEmpty(presetIdx, modelIdx) {
+            const preset = providerPresets[presetIdx];
+            if (!preset || !preset.models[modelIdx]) return;
+            const m = preset.models[modelIdx];
+            if (!configData.model_list) configData.model_list = [];
+            const exists = configData.model_list.some(existing => existing.model_name === m.model_name);
+            if (exists) {
+                showStatus(`Model "${m.model_name}" already exists`, 'error');
+                return;
+            }
+            configData.model_list.push({ ...m });
+            if (!configData.agents) configData.agents = {};
+            if (!configData.agents.defaults) configData.agents.defaults = {};
+            if (!configData.agents.defaults.model_name) {
+                configData.agents.defaults.model_name = m.model_name;
+            }
+            saveConfig().then(renderModels);
+            showStatus(`Added ${m.model_name}`, 'success');
+        }
+
         function renderModels() {
             const grid = document.getElementById('modelGrid');
-            if (!configData || !configData.model_list) {
-                grid.innerHTML = `<div style="color:var(--text4);font-size:13px;">${t('models.noModels')}</div>`; return;
+            const emptyState = document.getElementById('modelEmptyState');
+            const summary = document.getElementById('modelSummary');
+            const searchInput = document.getElementById('modelSearch');
+            const searchTerm = searchInput ? searchInput.value.trim().toLowerCase() : '';
+
+            renderQuickAddDropdown();
+
+            if (!configData || !configData.model_list || configData.model_list.length === 0) {
+                grid.innerHTML = '';
+                summary.style.display = 'none';
+                renderEmptyState();
+                return;
             }
+
+            emptyState.style.display = 'none';
             const primaryModelName = (configData.agents && configData.agents.defaults) ? (configData.agents.defaults.model_name || configData.agents.defaults.model || '') : '';
-            const indices = configData.model_list.map((_, i) => i);
-            indices.sort((a, b) => { const ap = configData.model_list[a].model_name === primaryModelName ? 0 : 1; const bp = configData.model_list[b].model_name === primaryModelName ? 0 : 1; return ap !== bp ? ap - bp : a - b; });
+
+            let filteredIndices = configData.model_list.map((_, i) => i);
+            if (searchTerm) {
+                filteredIndices = filteredIndices.filter(i => {
+                    const m = configData.model_list[i];
+                    return (m.model_name || '').toLowerCase().includes(searchTerm) ||
+                        (m.model || '').toLowerCase().includes(searchTerm) ||
+                        (m.api_base || '').toLowerCase().includes(searchTerm);
+                });
+            }
+
+            filteredIndices.sort((a, b) => {
+                const ap = configData.model_list[a].model_name === primaryModelName ? 0 : 1;
+                const bp = configData.model_list[b].model_name === primaryModelName ? 0 : 1;
+                return ap !== bp ? ap - bp : a - b;
+            });
+
+            // Summary bar
+            const total = configData.model_list.length;
+            const available = configData.model_list.filter(m => isModelAvailableGlobal(m)).length;
+            const primaryName = primaryModelName || 'none';
+            summary.style.display = 'flex';
+            summary.innerHTML = `
+                <span class="model-summary-item"><span class="model-summary-dot" style="background:var(--text3);"></span>${total} model${total !== 1 ? 's' : ''}</span>
+                <span class="model-summary-item"><span class="model-summary-dot" style="background:var(--green);"></span>${available} with keys</span>
+                <span class="model-summary-item"><span class="model-summary-dot" style="background:var(--neon-violet);"></span>Primary: ${esc(primaryName)}</span>
+                ${searchTerm ? `<span class="model-summary-item" style="margin-left:auto;color:var(--text4);">${filteredIndices.length} matching</span>` : ''}
+            `;
+
+            if (filteredIndices.length === 0 && searchTerm) {
+                grid.innerHTML = `<div style="color:var(--text4);font-size:13px;padding:20px;text-align:center;grid-column:1/-1;">No models match "${esc(searchTerm)}"</div>`;
+                return;
+            }
+
             let html = '';
-            indices.forEach(idx => {
+            filteredIndices.forEach(idx => {
                 const m = configData.model_list[idx];
                 const available = isModelAvailableGlobal(m);
                 const isPrimary = m.model_name === primaryModelName;
@@ -1762,6 +2161,27 @@
                 html += `</div></div>`;
             });
             grid.innerHTML = html;
+        }
+
+        function renderEmptyState() {
+            const emptyState = document.getElementById('modelEmptyState');
+            emptyState.style.display = 'block';
+            let html = '';
+            html += `<div class="model-empty">`;
+            html += `<div class="model-empty-icon">🤖</div>`;
+            html += `<div class="model-empty-title">No models configured</div>`;
+            html += `<div class="model-empty-desc">Add an LLM model to get started. Choose a provider below or add one manually.</div>`;
+            html += `<div class="model-presets">`;
+            providerPresets.forEach((p, pi) => {
+                html += `<button class="model-preset-btn" onclick="quickAddProvider(${pi})">`;
+                html += `<span class="quick-add-icon" style="background:${p.iconBg};color:${p.iconColor};font-weight:600;font-size:11px;width:20px;height:20px;border-radius:5px;">${p.icon}</span>`;
+                html += `${p.name}`;
+                html += `</button>`;
+            });
+            html += `</div>`;
+            html += `<div style="margin-top:20px;"><button class="btn" onclick="showAddModelModal()">Or add manually</button></div>`;
+            html += `</div>`;
+            emptyState.innerHTML = html;
         }
         function setPrimaryModel(idx) {
             if (!configData || !configData.model_list[idx]) return;
