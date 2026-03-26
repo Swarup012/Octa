@@ -162,6 +162,8 @@ Edit `~/.octa/config.json` — at minimum, add your API key:
 ### 3. Run
 
 ```bash
+# Onboarding
+octa onboard
 # Interactive terminal session
 octa agent
 
