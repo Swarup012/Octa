@@ -241,10 +241,13 @@ Telegram, Discord, Slack, WhatsApp, DingTalk, Feishu, LINE, WeCom, QQ, OneBot.
 octa agent              # Interactive terminal session
 octa agent -m "msg"     # One-shot query
 octa gateway            # Start gateway (bots + background jobs)
+octa dashboard          # Web-based config editor (models, channels, auth)
+octa onboard            # First-time setup wizard
 octa auth google        # Google OAuth flow
 octa status             # Health check
 octa cron               # Manage scheduled tasks
 octa skills             # Install/list/remove skills
+octa migrate            # Migrate from OpenClaw config format
 octa version            # Show version
 ```
 
