@@ -42,6 +42,7 @@ services:
       - gateway
     ports:
       - "18790:18790"
+      - "18800:18800"
     volumes:
       - octa-data:/root/.octa
     environment:

@@ -250,8 +250,13 @@ func gatewayCmd(debug bool) error {
 	channelManager.SetupHTTPServer(addr, healthServer)
 
 	if err := channelManager.StartAll(ctx); err != nil {
-		fmt.Printf("Error starting channels: %v\n", err)
-		return err
+		// Don't exit if no channels enabled — gateway can still serve dashboard + API
+		if err.Error() == "no channels enabled" {
+			fmt.Println("ℹ No channels enabled — running in API/dashboard-only mode")
+		} else {
+			fmt.Printf("Error starting channels: %v\n", err)
+			return err
+		}
 	}
 
 	fmt.Printf("✓ Health endpoints available at http://%s:%d/health and /ready\n", cfg.Gateway.Host, cfg.Gateway.Port)

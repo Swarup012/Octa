@@ -178,26 +178,38 @@ octa gateway
 
 ## 🐳 Docker
 
+### 1. Build and start
+
 ```bash
-# Build and start gateway bot
-make docker-gateway
-
-# Or run a one-shot query
-make docker-agent ARGS='-m "what tasks do I have today?"'
-
-# View logs
-make docker-gateway-logs
-
-# Stop
-make docker-gateway-stop
+git clone https://github.com/Swarup012/Octa.git
+cd Octa
+docker compose --profile gateway up -d
 ```
 
-First run creates a minimal config. Edit it:
+### 2. Add your API key
+
+First run creates a minimal config inside the container. Edit it:
+
 ```bash
 docker exec octa-gateway cat /root/.octa/config.json > /tmp/config.json
-# Edit /tmp/config.json with your API key
+# Edit /tmp/config.json — add your API key
 docker cp /tmp/config.json octa-gateway:/root/.octa/config.json
 docker restart octa-gateway
+```
+
+Or use the web dashboard at **http://localhost:18800** to configure models, channels, and auth.
+
+### 3. Other commands
+
+```bash
+# Run a one-shot query (no gateway needed)
+docker compose --profile agent run --rm octa-agent -m "what tasks do I have today?"
+
+# View logs
+docker compose logs -f octa-gateway
+
+# Stop
+docker compose --profile gateway down
 ```
 
 Image includes mpv, yt-dlp, and ffmpeg for music playback out of the box.
